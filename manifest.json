@@ -1,6 +1,6 @@
 {
   "name": "Game Trackers",
-  "short_name": "Trackers",
+  "short_name": "Achievement Game Tracker",
   "start_url": "/game-trackers/",
   "scope": "/game-trackers/",
   "display": "standalone",
