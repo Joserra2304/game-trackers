@@ -3,544 +3,459 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<link rel="manifest" href="/game-trackers/manifest.json">
-<meta name="theme-color" content="#111111">
-<link rel="icon" href="icon-192.png">
-<title>MINA — ACHIEVEMENT TRACKER</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0608">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Game Trackers">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>GAME ACHIEVEMENT TRACKERS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* Paleta GBC verde — misma estructura que versión morada */
-:root{
-  --s0:#0a1a0a; --s1:#0f380f; --s2:#1a4a1a; --s3:#306230; --s4:#5a8a2a;
-  --green1:#4a7a20; --green2:#8bac0f; --green3:#9bbc0f; --green4:#c4d4a8;
-  --dim:#2a4a1a;
-  /* Carcasa GBC — color negro/antracita como la GBC negra */
-  --shell:#2a2a35; --shell-d:#1a1a22; --shell-l:#3a3a48;
-  --shell-btn:#c83080; --shell-b:#2060c0;
+:root {
+  --bg:      #0a0608;
+  --surface: #130d10;
+  --surface2:#1c1318;
+  --border:  #2e1f26;
+  --red:     #8b1a2a;
+  --red2:    #a53137;
+  --red3:    #c04050;
+  --gold:    #c9a84c;
+  --gold-dim:#7a5f2a;
+  --silver:  #9ba8b0;
+  --text:    #e8ddd5;
+  --text-dim:#7a6b63;
+  --green:   #4caf72;
 }
 
-*{box-sizing:border-box;margin:0;padding:0;}
-html{
-  background:#1a2a1a;
-  min-height:100vh;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.gbc-wrap{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  /* Marco GBC en los bordes del móvil */
-  border-left:6px solid var(--shell-d);
-  border-right:6px solid var(--shell-d);
-  box-shadow:
-    inset 2px 0 0 var(--shell-l),
-    inset -2px 0 0 var(--shell-l),
-    -4px 0 12px rgba(0,0,0,0.5),
-    4px 0 12px rgba(0,0,0,0.5);
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(139,26,42,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 85%, rgba(139,26,42,0.06) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
 }
 
-/* PANTALLA borde a borde */
-.screen{
-  flex:1;
-  background:var(--s0);
-  position:relative;
-  overflow:hidden;
-  border-top:8px solid var(--shell-d);
-  border-bottom:none;
-  box-shadow:inset 0 4px 8px rgba(0,0,0,0.6);
+.app { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
+
+/* ── HEADER ── */
+header {
+  padding: 32px 20px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(139,26,42,0.18) 0%, transparent 100%);
 }
 
-/* Scanlines verdes */
-.screen::after{
-  content:'';position:fixed;inset:0;
-  background:repeating-linear-gradient(180deg,
-    transparent 0,transparent 3px,
-    rgba(15,56,15,0.18) 3px,rgba(15,56,15,0.18) 4px);
-  pointer-events:none;z-index:9999;
+.header-icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 14px;
+  display: block;
+  /* Si no hay imagen, muestra el fallback */
+}
+.header-icon img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(201,168,76,0.4));
+}
+.header-icon .fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+  filter: drop-shadow(0 0 10px rgba(201,168,76,0.3));
 }
 
-/* Viñeta LCD */
-.screen::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at center,transparent 55%,rgba(10,26,10,0.4) 100%);
-  pointer-events:none;z-index:9998;
+.site-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 32px;
+  color: var(--gold);
+  text-shadow: 0 0 24px rgba(201,168,76,0.35);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
 }
 
-.blink{animation:bl .8s steps(1) infinite;}
-@keyframes bl{50%{opacity:0;}}
-
-/* HEADER */
-.s-header{background:var(--s1);border-bottom:3px solid var(--s3);padding:10px 8px 8px;text-align:center;}
-.game-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--green3);text-shadow:2px 2px 0 var(--s1),3px 3px 0 #000;letter-spacing:1px;margin-bottom:4px;}
-.tracker-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green2);letter-spacing:2px;margin-bottom:2px;}
-.tracker-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:2px;}
-
-/* HUD corazones */
-.s-hud{background:#000;padding:5px 8px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--s3);}
-.hud-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--green2);}
-.hearts{display:flex;gap:2px;flex:1;}
-.heart{
-  width:9px;height:9px;background:var(--green2);
-  clip-path:polygon(50% 15%,61% 0,80% 0,100% 20%,100% 50%,50% 100%,0 50%,0 20%,20% 0,39% 0);
-}
-.heart.off{background:var(--s2);}
-.hud-right{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);white-space:nowrap;}
-
-/* TABS */
-.s-tabs{display:flex;background:#000;border-bottom:3px solid var(--s3);}
-.tab-btn{flex:1;padding:6px 1px;border:none;border-right:2px solid var(--s2);background:#000;color:var(--dim);font-family:'Press Start 2P',monospace;font-size:5px;cursor:pointer;text-align:center;}
-.tab-btn:last-child{border-right:none;}
-.tab-btn .tn{display:block;font-size:9px;margin-bottom:2px;color:inherit;}
-.tab-btn.active{background:var(--s2);color:var(--green3);border-bottom:3px solid var(--green2);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
-
-/* PROGRESS */
-.s-prog{background:var(--s2);border-bottom:2px solid var(--s3);padding:5px 8px;}
-.prog-lbl{display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);margin-bottom:3px;}
-.prog-lbl span{color:var(--green3);}
-.bar-out{height:10px;background:#000;border:2px solid var(--s3);overflow:hidden;box-shadow:inset 0 0 0 1px var(--green1);}
-.bar-in{height:100%;background:repeating-linear-gradient(90deg,var(--green3) 0,var(--green3) 6px,var(--green2) 6px,var(--green2) 8px);transition:width .3s steps(16);}
-
-/* PLAT */
-.s-plat{display:none;margin:6px;padding:10px 6px;background:var(--s1);border:3px solid var(--green3);text-align:center;animation:bord .8s steps(1) infinite;}
-@keyframes bord{50%{border-color:var(--s2);}}
-.s-plat.show{display:block;}
-.plat-ico{font-size:18px;margin-bottom:4px;filter:grayscale(1) brightness(2);}
-.plat-txt{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);margin-bottom:3px;}
-.plat-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);}
-
-/* PARTIDA HDR */
-.p-hdr{background:var(--s2);border-bottom:2px solid var(--s3);padding:8px;}
-.p-name{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);margin-bottom:3px;}
-.p-desc{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);line-height:2;margin-bottom:6px;}
-.p-row{display:flex;align-items:center;gap:6px;}
-.p-row .bar-out{flex:1;height:8px;}
-.p-pct{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green3);white-space:nowrap;min-width:36px;text-align:right;}
-
-/* CRON — LCD verde auténtico */
-.cron{margin:8px;background:#000;border:3px solid var(--green2);box-shadow:3px 3px 0 #000;padding:8px;}
-.cron-ttl{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);letter-spacing:1px;margin-bottom:6px;text-align:center;}
-.cron-lcd{background:#050f05;border:2px solid var(--s2);padding:7px 4px;text-align:center;font-family:'Press Start 2P',monospace;font-size:20px;color:var(--green3);letter-spacing:6px;text-shadow:0 0 8px var(--green3),0 0 2px #fff;margin-bottom:6px;box-shadow:inset 0 0 20px rgba(15,56,15,0.9);}
-.cron-lcd.warn{color:var(--green2);text-shadow:0 0 8px var(--green2);animation:bl .5s steps(1) infinite;}
-.cron-lcd.crit{color:var(--s3);text-shadow:0 0 8px var(--s3);animation:bl .3s steps(1) infinite;}
-.cron-btns{display:flex;gap:4px;}
-.cron-btn{flex:1;padding:6px 2px;background:var(--s1);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;color:var(--green4);font-family:'Press Start 2P',monospace;font-size:6px;cursor:pointer;text-align:center;}
-.cron-btn:active{transform:translate(2px,2px);box-shadow:none;}
-.cron-btn.start{border-color:var(--green2);color:var(--green3);}
-.cron-btn.pause{border-color:var(--green1);color:var(--green2);}
-.cron-btn.reset{border-color:var(--s3);color:var(--green4);}
-.cron-sv{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);text-align:center;margin-top:4px;}
-
-/* BOXES */
-.box-info{margin:5px 8px;padding:6px;background:rgba(139,172,15,0.05);border:2px solid var(--green2);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);line-height:2;}
-.box-warn{margin:5px 8px;padding:6px;background:rgba(48,98,48,0.1);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green3);line-height:2;}
-.box-ttl{display:block;margin-bottom:3px;letter-spacing:1px;}
-
-/* TRINKETS BOX */
-.box-trinkets{margin:5px 8px;padding:8px;background:rgba(155,188,15,0.06);border:2px solid var(--green3);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green4);line-height:2.2;}
-.box-trinkets .box-ttl{color:var(--green3);}
-.trinket-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;}
-.trinket-star{color:var(--green3);flex-shrink:0;}
-.trinket-name{color:var(--green3);}
-.trinket-why{color:var(--green2);font-size:5px;}
-
-/* CATEGORY */
-.cat{border-bottom:2px solid var(--s3);}
-.cat-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--s1);cursor:pointer;user-select:none;border-bottom:2px solid var(--s3);}
-.cat-hdr:active{background:var(--s2);}
-.cat-lft{display:flex;align-items:center;gap:5px;}
-.cat-ico{font-size:11px;}
-.cat-nm{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);letter-spacing:1px;}
-.cat-rgt{display:flex;align-items:center;gap:5px;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);}
-.cat-arr{color:var(--green2);font-size:7px;transition:transform .1s steps(3);}
-.cat.open .cat-arr{transform:rotate(90deg);}
-.cat-body{display:none;background:#000;}
-.cat.open .cat-body{display:block;}
-
-/* TROPHY */
-.trophy{display:flex;align-items:flex-start;gap:8px;padding:8px;border-bottom:2px solid var(--s2);cursor:pointer;-webkit-tap-highlight-color:transparent;background:#000;}
-.trophy:last-child{border-bottom:none;}
-.trophy:active{background:var(--s1);}
-.px-chk{width:12px;height:12px;background:var(--s2);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;margin-top:2px;color:var(--green3);}
-.trophy.done .px-chk{background:var(--green2);border-color:var(--green3);color:#000;}
-.t-info{flex:1;min-width:0;}
-.t-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--green4);margin-bottom:3px;line-height:1.8;}
-.trophy.done .t-name{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--green2);}
-.t-req{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);line-height:2;margin-bottom:4px;}
-.t-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.t-badge{display:inline-block;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 4px;border:2px solid;box-shadow:2px 2px 0 #000;letter-spacing:1px;}
-.d-easy  {color:var(--green4);border-color:var(--green2);background:rgba(155,188,15,0.1);}
-.d-medium{color:var(--green3);border-color:var(--green1);background:rgba(139,172,15,0.1);}
-.d-hard  {color:var(--green2);border-color:var(--s3);background:rgba(48,98,48,0.2);}
-.d-insane{color:var(--green4);border-color:var(--s1);background:var(--s2);}
-.t-pct{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);}
-
-/* ALL */
-.all-ttl{padding:5px 8px;font-family:'Press Start 2P',monospace;font-size:6px;letter-spacing:1px;background:var(--s2);color:var(--green2);border-bottom:2px solid var(--s3);border-top:2px solid var(--s3);}
-
-/* RESET */
-.reset-wrap{padding:10px 8px;text-align:center;background:var(--s1);border-top:2px solid var(--s3);}
-.px-btn{background:#000;border:2px solid var(--s3);box-shadow:3px 3px 0 #000;color:var(--green2);font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;cursor:pointer;letter-spacing:1px;}
-.px-btn:active{transform:translate(3px,3px);box-shadow:none;}
-.s-footer{padding:5px 8px;text-align:center;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);border-top:2px solid var(--s3);background:var(--s1);}
-
-/* BARRA BOTONES — carcasa negra GBC */
-.controls-bar{
-  background:var(--shell);
-  border-top:4px solid var(--shell-d);
-  padding:10px 16px 14px;
-  display:flex;justify-content:space-between;align-items:center;
-  box-shadow:inset 0 2px 0 var(--shell-l),inset 0 -3px 0 var(--shell-d);
+.site-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
-.dpad{width:48px;height:48px;position:relative;flex-shrink:0;}
-.dpad-h,.dpad-v{position:absolute;background:var(--shell-d);border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 2px 0 rgba(0,0,0,0.5);}
-.dpad-h{width:100%;height:34%;top:33%;left:0;}
-.dpad-v{width:34%;height:100%;top:0;left:33%;}
-.dpad-ctr{position:absolute;width:34%;height:34%;top:33%;left:33%;background:var(--shell-d);}
-
-.mid-btns{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.mini-row{display:flex;gap:14px;}
-.mini-btn{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.mini-oval{background:var(--shell-d);width:24px;height:7px;border-radius:4px;box-shadow:0 2px 0 rgba(0,0,0,0.4);transform:rotate(-15deg);}
-.mini-lbl{font-family:'Press Start 2P',monospace;font-size:4px;color:rgba(255,255,255,0.2);letter-spacing:1px;}
-
-.ab-wrap{display:flex;gap:10px;align-items:center;flex-shrink:0;}
-.btn-b,.btn-a{border-radius:50%;box-shadow:0 3px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15);font-family:'Press Start 2P',monospace;font-size:6px;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;cursor:default;}
-.btn-b{width:28px;height:28px;background:var(--shell-btn);margin-top:12px;}
-.btn-a{width:32px;height:32px;background:var(--shell-btn);}
-
-/* LED verde activo */
-.led{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  width:6px;height:6px;background:var(--green3);border-radius:50%;
-  box-shadow:0 0 6px var(--green3),0 0 12px rgba(155,188,15,0.5);
-  animation:led-pulse 2s ease-in-out infinite;
+/* ── GLOBAL ── */
+.global {
+  padding: 16px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
-@keyframes led-pulse{0%,100%{opacity:1;} 50%{opacity:0.6;}}
+
+.g-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.g-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.g-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.g-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.g-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.g-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.pill {
+  flex: 1;
+  padding: 10px 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.pill-val {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.pill-lbl {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 16px 20px 8px;
+}
+
+/* ── GAME CARD ── */
+.game-card {
+  margin: 0 16px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.game-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
+}
+
+.game-card:active { background: var(--surface2); }
+.game-card.disabled { opacity: 0.35; pointer-events: none; }
+
+/* Línea de color izquierda */
+.card-accent {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+
+.card-body {
+  padding: 14px 14px 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.game-icon {
+  width: 52px; height: 52px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.game-icon img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.game-icon .ico-fallback { font-size: 28px; }
+
+.game-meta { flex: 1; min-width: 0; }
+
+.game-name {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 20px;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.game-studio {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.game-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.game-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.game-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.game-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.status-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  padding: 3px 7px;
+  border: 1px solid;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.s-plat   { color: var(--gold);   border-color: var(--gold-dim);  background: rgba(201,168,76,0.08); }
+.s-prog   { color: var(--green);  border-color: rgba(76,175,114,0.4); background: rgba(76,175,114,0.05); }
+.s-new    { color: var(--red3);   border-color: var(--red);       background: rgba(139,26,42,0.08); }
+.s-soon   { color: var(--text-dim); border-color: var(--border); }
+
+.coming-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 5px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── FOOTER ── */
+.spacer { flex: 1; }
+
+footer {
+  padding: 20px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  border-top: 1px solid var(--border);
+}
 </style>
 </head>
 <body>
-<div class="gbc-wrap">
+<div class="app">
 
-  <div class="screen">
-    <div class="s-header">
-      <div class="game-title">MINA THE HOLLOWER</div>
-      <div class="tracker-lbl">ACHIEVEMENT TRACKER</div>
-      <div class="tracker-sub">&#9670; STEAM &#9670; <span class="blink">&#9608;</span></div>
+  <header>
+    <div class="header-icon">
+      <img src="icon-192.png" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>🏆</div>'">
     </div>
+    <div class="site-title">Game Trackers</div>
+    <div class="site-sub">◈ Joserra · Steam ◈</div>
+  </header>
 
-    <div class="s-hud">
-      <div class="hud-lbl">HP</div>
-      <div class="hearts" id="hearts"></div>
-      <div class="hud-right" id="hudCount">00/50</div>
+  <div class="global">
+    <div class="g-row">
+      <span class="g-label">Progreso total</span>
+      <span class="g-num" id="gNum">0 / 0</span>
     </div>
-
-    <div class="s-tabs">
-      <button class="tab-btn active" data-tab="0" onclick="showTab('0')"><span class="tn">P1</span>HIST</button>
-      <button class="tab-btn" data-tab="1" onclick="showTab('1')"><span class="tn">P2</span>NG+</button>
-      <button class="tab-btn" data-tab="2" onclick="showTab('2')"><span class="tn">P3</span>MISC</button>
-      <button class="tab-btn" data-tab="any" onclick="showTab('any')"><span class="tn">ANY</span>LIBRE</button>
-      <button class="tab-btn" data-tab="all" onclick="showTab('all')"><span class="tn">ALL</span>TODO</button>
+    <div class="g-bar">
+      <div class="g-fill" id="gBar" style="width:0%"></div>
     </div>
-
-    <div class="s-prog">
-      <div class="prog-lbl">PROGRESO <span id="gPct">0%</span></div>
-      <div class="bar-out"><div class="bar-in" id="gBar" style="width:0%"></div></div>
+    <div class="g-pills">
+      <div class="pill"><span class="pill-val" id="mJuegos">0</span><span class="pill-lbl">Juegos</span></div>
+      <div class="pill"><span class="pill-val" id="mComp">0</span><span class="pill-lbl">Platinos</span></div>
+      <div class="pill"><span class="pill-val" id="mPct">0%</span><span class="pill-lbl">Global</span></div>
     </div>
-
-    <div class="s-plat" id="platBanner">
-      <div class="plat-ico">&#9733;</div>
-      <div class="plat-txt">FEAT ACCOMPLI!</div>
-      <div class="plat-sub">100% STEAM</div>
-    </div>
-
-    <div id="tab-0"   class="tab-content active"></div>
-    <div id="tab-1"   class="tab-content"></div>
-    <div id="tab-2"   class="tab-content"></div>
-    <div id="tab-any" class="tab-content"></div>
-    <div id="tab-all" class="tab-content"></div>
-
-    <div class="reset-wrap">
-      <button class="px-btn" onclick="resetAll()">&#9632; RESET &#9632;</button>
-    </div>
-    <div class="s-footer">JOSERRA &#9632; ACHIEVEMENT TRACKER &#9632; 2026</div>
   </div>
 
-  <!-- Barra botones carcasa -->
-  <div class="controls-bar" style="position:relative;">
-    <div class="led"></div>
-    <div class="dpad">
-      <div class="dpad-h"></div><div class="dpad-v"></div><div class="dpad-ctr"></div>
-    </div>
-    <div class="mid-btns">
-      <div class="mini-row">
-        <div class="mini-btn"><div class="mini-oval"></div><div class="mini-lbl">SELECT</div></div>
-        <div class="mini-btn"><div class="mini-oval"></div><div class="mini-lbl">START</div></div>
+  <div class="section-title">◈ Mis juegos</div>
+
+  <!-- MINA THE HOLLOWER -->
+  <a class="game-card" href="mina-the-hollower/index.html">
+    <div class="card-accent" style="background:var(--red2)"></div>
+    <div class="card-body">
+      <div class="game-icon">
+        <img src="mina-sprite.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="ico-fallback" style="display:none">🐭</span>
       </div>
+      <div class="game-meta">
+        <div class="game-name" style="color:var(--gold)">Mina the Hollower</div>
+        <div class="game-studio">Yacht Club Games · 2026</div>
+        <div class="game-bar">
+          <div class="game-bar-fill" id="bar-mina" style="width:0%;background:linear-gradient(90deg,var(--gold-dim),var(--gold))"></div>
+        </div>
+        <div class="game-footer">
+          <span class="game-count" id="count-mina">0 / 50 logros</span>
+          <span class="status-tag s-prog" id="badge-mina">En progreso</span>
+        </div>
+      </div>
+      <div class="game-pct" id="pct-mina" style="color:var(--gold)">0%</div>
     </div>
-    <div class="ab-wrap">
-      <div class="btn-b">B</div>
-      <div class="btn-a">A</div>
+  </a>
+
+  <!-- SHOVEL KNIGHT -->
+  <div class="game-card disabled">
+    <div class="card-accent" style="background:#45b7d1"></div>
+    <div class="card-body">
+      <div class="game-icon">
+        <span class="ico-fallback">⚔️</span>
+      </div>
+      <div class="game-meta">
+        <div class="game-name" style="color:#45b7d1">Shovel Knight</div>
+        <div class="game-studio">Yacht Club Games · Treasure Trove</div>
+        <div class="game-bar">
+          <div class="game-bar-fill" style="width:0%;background:#45b7d1"></div>
+        </div>
+        <div class="game-footer">
+          <span class="game-count">0 / 138 logros</span>
+          <span class="status-tag s-soon">Próximamente</span>
+        </div>
+      </div>
+      <div class="game-pct" style="color:rgba(160,140,200,0.3)">--</div>
     </div>
+    <div class="coming-label">⚙ Tracker en construcción</div>
   </div>
+
+  <div class="spacer"></div>
+  <footer>Joserra · Game Trackers · 2026</footer>
 
 </div>
 
 <script>
-const SK='mina_platinum_v1',CK='mina_cron_v1',CT=14400;
-const DLBL={easy:'FACIL',medium:'NORMAL',hard:'DIFICIL',insane:'EXTREMO'};
-
-const ANY_CAT=[{ico:'⚔️',nm:'CUALQUIER RUN — mejor en NG+',ts:[
-  {id:'hammerama',       nm:'Hammerama',       req:'Derrota un jefe solo con Blaststrike Maul cargado',    dif:'hard',  pct:'~12%'},
-  {id:'untouchable',     nm:'Untouchable',     req:'Derrota un jefe Generador sin recibir daño',           dif:'hard',  pct:'~12%'},
-  {id:'sniper-dagger',   nm:'Sniper Dagger',   req:'Mata jefe con Whisper y Vesper cruzando pantalla',     dif:'hard',  pct:'~10%'},
-  {id:'tip-tapper',      nm:'Tip Tapper',      req:'10 enemigos con la punta del Nightstar Dread Mace',    dif:'hard',  pct:'~8%'},
-  {id:'joule-junkie',    nm:'Joule Junkie',    req:'Mata jefe a 1HP solo Sidearms + Joule Syringe',        dif:'hard',  pct:'~8%'},
-  {id:'shock-tactician', nm:'Shock Tactician', req:'Derrota jefe con chispa del Shock Flint Trinket',      dif:'hard',  pct:'~9%'},
-  {id:'perfect-guard',   nm:'Perfect Guard',   req:'Para 15 ataques seguidos con Guardian Casket',         dif:'hard',  pct:'~10%'},
-  {id:'plasma-survivor', nm:'Plasma Survivor', req:'Llena deposito con Plasma Jug estando a 1 HP',         dif:'hard',  pct:'~12%'},
-  {id:'bonestone-tycoon',nm:'Bonestone Tycoon',req:'Convierte 20000+ Bones en Bone Sinterer de una vez',   dif:'easy',  pct:'~30%'},
-  {id:'lopsided',        nm:'Lopsided',        req:'Sube una stat a 10 con el resto a 3 o menos',          dif:'medium',pct:'~20%'},
-  {id:'beckoning-buddy', nm:'Beckoning Buddy', req:'Criatura Beckoning Collar activa todo combate jefe',   dif:'medium',pct:'~22%'},
-  {id:'combo-conductor', nm:'Combo Conductor', req:'Combo maximo 10s con Chain Capacitor en combate',      dif:'medium',pct:'~25%'},
-  {id:'masochist',       nm:'Masochist',       req:'Derrota jefe con exactamente 3 Beastium Trinkets',     dif:'medium',pct:'~18%'},
-  {id:'pendulum-master', nm:'Pendulum Master', req:'Para 10 ataques sin daño con Dodging Pendulum',        dif:'medium',pct:'~20%'},
-]}];
-
-const PARTIDAS=[
-  {name:'PARTIDA 1',col:'#9bbc0f',
-   desc:'Historia + Coleccion + Sidearms basicos.',
-   warn:null,info:null,
-   cats:[
-    {ico:'📖',nm:'HISTORIA',ts:[
-      {id:'hollow-victory',  nm:'Hollow Victory',  req:'Termina el juego',                        dif:'easy',  pct:'~45%'},
-      {id:'sparks-of-genius',nm:'Sparks of Genius', req:'Restaura la mitad de los Generadores',    dif:'easy',  pct:'~60%'},
-      {id:'renegade-roundup',nm:'Renegade Roundup', req:'Derrota Armand Maxi Willis Dugin Evra',   dif:'medium',pct:'~25%'},
-      {id:'thorne-beater',   nm:'Thorne Beater',    req:'Derrota a Thorne por primera vez',         dif:'easy',  pct:'~65%'},
-      {id:'first-purchase',  nm:'First Purchase',   req:'Compra tu primer objeto',                  dif:'easy',  pct:'~80%'},
-      {id:'traumatized',     nm:'Traumatized',      req:'Baila con Poppit',                         dif:'easy',  pct:'~55%'},
-    ]},
-    {ico:'🏆',nm:'COLECCION',ts:[
-      {id:'fully-equipped',nm:'Fully Equipped',  req:'Desbloquea todas armas trinkets capas y mejoras',dif:'medium',pct:'~20%'},
-      {id:'big-spender',   nm:'Big Spender',    req:'Gasta 50000 Bones en tiendas en total',          dif:'medium',pct:'~18%'},
-      {id:'fishin-reactor',nm:"Fishin' Reactor", req:'Consigue todos los trofeos del Fish Board',      dif:'medium',pct:'~15%'},
-      {id:'pawned-off',    nm:'Pawned Off',     req:"Vende el maximo en Pawnty's Exchange",            dif:'easy',  pct:'~35%'},
-    ]},
-    {ico:'⚔️',nm:'SIDEARMS',ts:[
-      {id:'bashful',         nm:'Bashful',          req:'3 enemigos de una carga con Drill Driver',     dif:'easy',  pct:'~40%'},
-      {id:'boomerang-blade', nm:'Boomerang Blade',   req:'2 enemigos con Gyro Dagger cambiando dir.',    dif:'easy',  pct:'~38%'},
-      {id:'bounding-bonanza',nm:'Bounding Bonanza',  req:'Enemigo con Bounding Bomb tras 3 rebotes',    dif:'medium',pct:'~22%'},
-      {id:'buster-bounce',   nm:'Buster Bounce',     req:'3 enemigos con doble rebote Battery Buster',  dif:'medium',pct:'~20%'},
-      {id:'fogburst',        nm:'Fogburst',          req:'6 enemigos con spray del Fog Thrower',        dif:'easy',  pct:'~42%'},
-      {id:'four-point-hatchet',nm:'Four-Point Hatchet',req:'4 enemigos con 4 chispas Volt Hatchet',   dif:'medium',pct:'~25%'},
-      {id:'haunting-reach',  nm:'Haunting Reach',    req:'Golpea a 25 tiles con Gnawing Ghosts',        dif:'medium',pct:'~28%'},
-      {id:'light-em-up',     nm:"Light 'em Up",      req:'Evita destino oscuro con Dynamo Lantern',     dif:'medium',pct:'~30%'},
-      {id:'mist-glide',      nm:'Mist Glide',        req:'3 enemigos de un uso con Mist Jar',           dif:'easy',  pct:'~40%'},
-      {id:'pitfall-parasol', nm:'Pitfall Parasol',   req:'Varios enemigos al foso con Deflector',       dif:'easy',  pct:'~38%'},
-      {id:'skippin-stone',   nm:"Skippin' Stone",    req:"8 tiles sobre agua con Hollower's Rocks",     dif:'medium',pct:'~20%'},
-      {id:'wormhole',        nm:'Wormhole',          req:'Mata enemigo tras teletransportarte con Recall',dif:'easy', pct:'~45%'},
-    ]},
-    {ico:'🎮',nm:'MINIJUEGOS',ts:[
-      {id:'minigame-master',   nm:'Minigame Master',   req:'Racing Ring Dive y Wrecker',           dif:'medium',pct:'~15%'},
-      {id:'opossum-impressem', nm:'Opossum Impressem', req:'10 tiles sin tocar el suelo (Lena)',   dif:'easy',  pct:'~35%'},
-      {id:'trash-juggler',     nm:'Trash Juggler',     req:'Manda la lata por debajo del puente',  dif:'easy',  pct:'~30%'},
-    ]},
-    {ico:'🚗',nm:'IRON STEED',ts:[
-      {id:'steed-hopper',nm:'Steed Hopper',req:'3 enemigos en Iron Steed sin tocar suelo',   dif:'easy',pct:'~32%'},
-      {id:'drag-race',   nm:'Drag Race',   req:'6 pantallas en Iron Steed sin marcha atras', dif:'easy',pct:'~30%'},
-    ]},
-  ]},
-  {name:'PARTIDA 2',col:'#8bac0f',
-   desc:'NG+ todo en una run. Sin gastar Bones ni Underlab.',
-   warn:'DIFICULTADORES: Sin venta Armas + Sin venta Suministrador + Laboratorios cerrados. OJO: Labs cerrados = sin Underlab, compatible con Off the Grid.',
-   info:'CONFIRMADO: Speed Runner + Bone Pincher + Bone Keeper + Hardifier + Off the Grid en una sola run NG+.',
-   cats:[
-    {ico:'🔄',nm:'NG+',ts:[
-      {id:'hollowin-again',nm:"Hollowin' Again!",req:'Termina el juego en New Game Plus',dif:'easy',pct:'~20%'},
-    ]},
-    {ico:'⏱',nm:'SPEEDRUN',ts:[
-      {id:'speed-runner',nm:'Speed Runner',req:'Termina en menos de 4 horas',dif:'medium',pct:'~15%'},
-    ]},
-    {ico:'💰',nm:'BONES',ts:[
-      {id:'bone-keeper', nm:'Bone Keeper', req:'Sin perder tus Bones en ningun momento',                    dif:'hard',  pct:'~8%'},
-      {id:'bone-pincher',nm:'Bone Pincher',req:'Sin gastar Bones en tiendas. Puedes recogerlos y subir nivel.',dif:'medium',pct:'~12%'},
-    ]},
-    {ico:'💀',nm:'DIFICULTADORES',ts:[
-      {id:'hardifier',      nm:'Hardifier',               req:'3 dificultadores activos al terminar el juego',  dif:'medium',pct:'~14%'},
-      {id:'no-shop-weapons',nm:'[MOD] Sin venta: Armas',  req:'Dificultador: no aparecen armas en tiendas',    dif:'easy',  pct:'-'},
-      {id:'no-shop-sumin',  nm:'[MOD] Sin venta: Sumin.', req:'Dificultador: el Suministrador no aparece',     dif:'easy',  pct:'-'},
-      {id:'no-underlabs',   nm:'[MOD] Labs cerrados',     req:'Dificultador: sin Underlabs en el mapa. Compatible con Off the Grid.',dif:'hard',pct:'-'},
-    ]},
-    {ico:'🚫',nm:'SIN UNDERLAB',ts:[
-      {id:'off-the-grid',nm:'Off the Grid',req:'Sin entrar al Underlab. Usa Proto Spark. Labs cerrados ya lo garantiza.',dif:'hard',pct:'~6%'},
-    ]},
-  ]},
-  {name:'PARTIDA 3',col:'#4a7a20',
-   desc:'Partida NUEVA. Solo Nightstar. Sin coleccionables.',
-   warn:'PARTIDA NUEVA no NG+. Solo Nightstar. No cojas Maul ni Daggers ni trinkets ni coleccionables.',
-   info:null,
-   cats:[
-    {ico:'📉',nm:'BELOW ZERO',ts:[
-      {id:'below-zero',nm:'Below Zero',req:'Termina con -1% de Coleccion. No recojas nada.',dif:'hard',pct:'~5%'},
-    ]},
-    {ico:'🌀',nm:'WEIRDIFIER',ts:[
-      {id:'weirdifier',nm:'Weirdifier',req:'Termina con 3 modificadores Weird activos.',dif:'medium',pct:'~10%'},
-    ]},
-  ]},
+const GAMES = [
+  { id: 'mina', key: 'mina_platinum_v1', total: 50 },
 ];
 
-let ch={};
-function load(){try{const s=localStorage.getItem(SK);if(s)ch=JSON.parse(s);}catch(e){ch={};}}
-function save(){try{localStorage.setItem(SK,JSON.stringify(ch));}catch(e){}}
-function tog(id){ch[id]=!ch[id];save();render();}
-function resetAll(){ch={};save();render();}
-function allTs(){let t=[...ANY_CAT.flatMap(c=>c.ts)];PARTIDAS.forEach(p=>p.cats.forEach(c=>t=t.concat(c.ts)));return t;}
-function total(){return allTs().length;}
-function dn(){return Object.values(ch).filter(Boolean).length;}
-
-let cr=CT,run=false,iv=null;
-function cload(){try{const s=localStorage.getItem(CK);if(s!==null)cr=parseInt(s,10);}catch(e){}}
-function csave(){try{localStorage.setItem(CK,cr);}catch(e){}}
-function cfmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;}
-function cui(){
-  const d=document.getElementById('cd'),b=document.getElementById('cb'),btn=document.getElementById('csb'),sv=document.getElementById('csv');
-  if(!d)return;
-  d.textContent=cfmt(cr);if(b)b.style.width=(cr/CT*100)+'%';
-  d.className=cr<=0?'cron-lcd crit':cr<=3600?'cron-lcd warn':'cron-lcd';
-  if(btn){btn.textContent=run?'PAUSE':'START';btn.className='cron-btn '+(run?'pause':'start');}
-  if(sv){try{const ts=localStorage.getItem(CK+'_ts');sv.textContent=ts?'SAV:'+ts:'';}catch(e){}}
-}
-function ctick(){if(cr>0){cr--;if(cr===3600)alert('>> 1 HORA RESTANTE!');csave();try{localStorage.setItem(CK+'_ts',new Date().toLocaleTimeString('es-ES'));}catch(e){}cui();}else{cstop();alert('>> GAME OVER: 4H!');}}
-function cstart(){if(run||cr<=0)return;run=true;iv=setInterval(ctick,1000);cui();}
-function cstop(){run=false;clearInterval(iv);cui();}
-function ctog(){run?cstop():cstart();}
-function creset(){cstop();cr=CT;csave();try{localStorage.removeItem(CK+'_ts');}catch(e){}render();cui();}
-
-function buildCron(){return`<div class="cron">
-<div class="cron-ttl">&#9632; SPEED RUNNER TIMER &#9632;</div>
-<div class="cron-lcd" id="cd">${cfmt(cr)}</div>
-<div class="bar-out" style="margin-bottom:8px;height:8px"><div class="bar-in" id="cb" style="width:${cr/CT*100}%"></div></div>
-<div class="cron-btns">
-  <button class="cron-btn start" id="csb" onclick="ctog()">START</button>
-  <button class="cron-btn reset" onclick="creset()">RESET</button>
-</div>
-<div class="cron-sv" id="csv"></div>
-</div>`;}
-
-function buildTrinkets(){return`<div class="box-trinkets">
-<span class="box-ttl">&#9632; TRINKETS RECOMENDADOS PARA NG+</span>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Proto Spark</div><div class="trinket-why">IMPRESCINDIBLE — revive 1 vez por encuentro. Sin esto Off the Grid es casi imposible.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Joule Syringe</div><div class="trinket-why">Para Joule Junkie. Mata jefe a 1HP solo con Sidearms.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Dodging Pendulum</div><div class="trinket-why">Para Pendulum Master (10 paradas) y supervivencia real.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Guardian Casket</div><div class="trinket-why">Para Perfect Guard (15 seguidos) y proteccion activa.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Chain Capacitor</div><div class="trinket-why">Para Combo Conductor (10s combo). Facil mientras juegas.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Beckoning Collar</div><div class="trinket-why">Para Beckoning Buddy. Solo necesitas llevarlo en un jefe.</div></div></div>
-</div>`;}
-
-function bT(t){
-  const ok=!!ch[t.id];
-  return`<div class="trophy${ok?' done':''}" onclick="tog('${t.id}')">
-<div class="px-chk">${ok?'&#10003;':''}</div>
-<div class="t-info">
-  <div class="t-name">${t.nm}</div>
-  <div class="t-req">${t.req}</div>
-  <div class="t-meta">
-    <span class="t-badge d-${t.dif}">${DLBL[t.dif]}</span>
-    <span class="t-pct">STEAM:${t.pct}</span>
-  </div>
-</div>
-</div>`;}
-
-function bCats(cats,pi){
-  return cats.map((c,ci)=>{
-    const id=`c${pi}${ci}`;const cd=c.ts.filter(t=>ch[t.id]).length;
-    return`<div class="cat open" id="${id}">
-<div class="cat-hdr" onclick="tc('${id}')">
-  <div class="cat-lft"><span class="cat-ico">${c.ico}</span><span class="cat-nm">${c.nm}</span></div>
-  <div class="cat-rgt"><span>${cd}/${c.ts.length}</span><span class="cat-arr">&#9658;</span></div>
-</div>
-<div class="cat-body">${c.ts.map(t=>bT(t)).join('')}</div>
-</div>`;}).join('');}
-
-function bP(p,pi){
-  const all=p.cats.flatMap(c=>c.ts);
-  const d=all.filter(t=>ch[t.id]).length;
-  const pct=all.length?Math.round(d/all.length*100):0;
-  let h=`<div class="p-hdr">
-<div class="p-name" style="color:${p.col}">&#9658; ${p.name}</div>
-<div class="p-desc">${p.desc}</div>
-<div class="p-row">
-  <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:repeating-linear-gradient(90deg,${p.col} 0,${p.col} 5px,rgba(0,0,0,0.5) 5px,rgba(0,0,0,0.5) 7px)"></div></div>
-  <div class="p-pct" style="color:${p.col}">${d}/${all.length}</div>
-</div>
-</div>`;
-  if(pi===1){h+=buildCron();h+=buildTrinkets();}
-  if(p.info)h+=`<div class="box-info"><span class="box-ttl">&#9658; INFO</span>${p.info}</div>`;
-  if(p.warn)h+=`<div class="box-warn"><span class="box-ttl">&#9658; ATENCION</span>${p.warn}</div>`;
-  h+=bCats(p.cats,pi);return h;
+function getProgress(key) {
+  try {
+    const s = localStorage.getItem(key);
+    if (!s) return 0;
+    return Object.values(JSON.parse(s)).filter(Boolean).length;
+  } catch(e) { return 0; }
 }
 
-function bAny(){
-  const d=ANY_CAT.flatMap(c=>c.ts).filter(t=>ch[t.id]).length;
-  const tot=ANY_CAT.flatMap(c=>c.ts).length;
-  const pct=Math.round(d/tot*100);
-  let h=`<div class="p-hdr">
-<div class="p-name" style="color:#c4d4a8">&#9658; CUALQUIER PARTIDA</div>
-<div class="p-desc">Con jefes y trinkets. Ideales para NG+ con todo disponible.</div>
-<div class="p-row">
-  <div class="bar-out"><div class="bar-in" style="width:${pct}%"></div></div>
-  <div class="p-pct">${d}/${tot}</div>
-</div>
-</div>`;
-  h+=bCats(ANY_CAT,'a');return h;
-}
+function render() {
+  let gDone = 0, gTotal = 0, gComp = 0;
 
-function bAll(){
-  let h=`<div class="all-ttl">&#9658; CUALQUIER PARTIDA</div>`;
-  ANY_CAT.forEach(c=>c.ts.forEach(t=>{h+=bT(t);}));
-  PARTIDAS.forEach((p,pi)=>{
-    h+=`<div class="all-ttl" style="color:${p.col}">&#9658; ${p.name}</div>`;
-    p.cats.forEach(c=>c.ts.forEach(t=>{h+=bT(t);}));
+  GAMES.forEach(g => {
+    const d = getProgress(g.key);
+    const pct = g.total ? Math.round(d / g.total * 100) : 0;
+    gDone += d; gTotal += g.total;
+    if (d >= g.total) gComp++;
+
+    const ep  = document.getElementById('pct-'   + g.id);
+    const eb  = document.getElementById('bar-'   + g.id);
+    const ec  = document.getElementById('count-' + g.id);
+    const ebg = document.getElementById('badge-' + g.id);
+
+    if (ep)  ep.textContent  = pct + '%';
+    if (eb)  eb.style.width  = pct + '%';
+    if (ec)  ec.textContent  = d + ' / ' + g.total + ' logros';
+    if (ebg) {
+      if (d >= g.total) {
+        ebg.textContent = '🏆 Platino';
+        ebg.className   = 'status-tag s-plat';
+      } else if (d > 0) {
+        ebg.textContent = 'En progreso';
+        ebg.className   = 'status-tag s-prog';
+      } else {
+        ebg.textContent = 'Sin empezar';
+        ebg.className   = 'status-tag s-new';
+      }
+    }
   });
-  const ok=dn()>=total();
-  h+=`<div class="all-ttl" style="color:#9bbc0f">&#9658; PLATINO</div>
-<div class="trophy${ok?' done':''}">
-<div class="px-chk">${ok?'&#10003;':''}</div>
-<div class="t-info">
-  <div class="t-name">FEAT ACCOMPLI</div>
-  <div class="t-req">Consigue todas las hazanas</div>
-  <div class="t-meta"><span class="t-badge d-insane">EXTREMO</span><span class="t-pct">STEAM:~1%</span></div>
-</div>
-</div>`;return h;
+
+  const gp = gTotal ? Math.round(gDone / gTotal * 100) : 0;
+  document.getElementById('gNum').textContent    = gDone + ' / ' + gTotal;
+  document.getElementById('gBar').style.width    = gp + '%';
+  document.getElementById('mJuegos').textContent = GAMES.length + 1;
+  document.getElementById('mComp').textContent   = gComp;
+  document.getElementById('mPct').textContent    = gp + '%';
 }
 
-function render(){
-  const d=dn(),tot=total(),pct=Math.round(d/tot*100);
-  const hh=document.getElementById('hearts');
-  if(hh){const f=Math.min(10,Math.floor(d/(tot/10)));hh.innerHTML=Array.from({length:10},(_,i)=>`<div class="heart${i<f?'':' off'}"></div>`).join('');}
-  const hc=document.getElementById('hudCount');if(hc)hc.textContent=String(d).padStart(2,'0')+'/'+String(tot+1).padStart(2,'0');
-  const gb=document.getElementById('gBar');if(gb)gb.style.width=pct+'%';
-  const gp=document.getElementById('gPct');if(gp)gp.textContent=pct+'%';
-  document.getElementById('platBanner').classList.toggle('show',d>=tot);
-  PARTIDAS.forEach((_,pi)=>document.getElementById('tab-'+pi).innerHTML=bP(PARTIDAS[pi],pi));
-  document.getElementById('tab-any').innerHTML=bAny();
-  document.getElementById('tab-all').innerHTML=bAll();
-  cui();
-}
-
-function tc(id){document.getElementById(id).classList.toggle('open');}
-function showTab(t){
-  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  document.querySelector('[data-tab="'+t+'"]').classList.add('active');
-}
-
-cload();load();render();
+render();
 </script>
 </body>
 </html>
