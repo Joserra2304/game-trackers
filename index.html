@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#0a0608">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Game Trackers">
+<meta name="apple-mobile-web-app-title" content="GAT">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>GAME ACHIEVEMENT TRACKERS</title>
+<title>GAT — Game Achievement Tracker</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=VT323&family=Playfair+Display:ital,wght@0,700;1,400&family=Crimson+Pro:wght@400;600&display=swap');
 
 :root {
   --bg:      #0a0608;
@@ -23,7 +23,6 @@
   --red3:    #c04050;
   --gold:    #c9a84c;
   --gold-dim:#7a5f2a;
-  --silver:  #9ba8b0;
   --text:    #e8ddd5;
   --text-dim:#7a6b63;
   --green:   #4caf72;
@@ -51,69 +50,83 @@ body::before {
 
 .app { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
 
+/* ── HEADER ── */
 header {
-  padding: 32px 20px 20px;
+  padding: 28px 20px 18px;
   text-align: center;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(139,26,42,0.18) 0%, transparent 100%);
 }
 
-.header-icon { width: 72px; height: 72px; margin: 0 auto 14px; display: block; }
+.header-icon { width: 68px; height: 68px; margin: 0 auto 12px; display: block; }
 .header-icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 12px rgba(201,168,76,0.4)); }
-.header-icon .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 44px; }
+.header-icon .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 42px; }
 
+/* Título con Cinzel Decorative — elegante, atemporal */
 .site-title {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 32px; color: var(--gold);
-  text-shadow: 0 0 24px rgba(201,168,76,0.35);
-  letter-spacing: 1px; margin-bottom: 4px;
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 18px;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(201,168,76,0.3);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+  line-height: 1.3;
 }
 
-.site-sub {
+.site-agt {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px; color: var(--text-dim);
-  letter-spacing: 3px; text-transform: uppercase;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 0;
 }
 
+/* ── GLOBAL ── */
 .global {
-  padding: 16px 20px;
+  padding: 14px 18px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
 
-.g-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.g-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
-.g-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: var(--gold); }
-.g-bar { height: 5px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 14px; }
+.g-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.g-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+.g-num { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold); }
+
+.g-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
 .g-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 0.5s ease; }
 
 .g-pills { display: flex; gap: 8px; }
-.pill { flex: 1; padding: 10px 6px; background: var(--surface2); border: 1px solid var(--border); text-align: center; }
-.pill-val { display: block; font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-.pill-lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+.pill { flex: 1; padding: 9px 6px; background: var(--surface2); border: 1px solid var(--border); text-align: center; }
+.pill-val { display: block; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.pill-lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 7px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
 
-.section-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; padding: 16px 20px 8px; }
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 9px; color: var(--text-dim);
+  letter-spacing: 3px; text-transform: uppercase;
+  padding: 14px 18px 8px;
+}
 
+/* ── GAME CARD ── */
 .game-card {
-  margin: 0 16px 12px;
+  margin: 0 14px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   display: block; text-decoration: none; color: inherit;
   -webkit-tap-highlight-color: transparent;
   position: relative; overflow: hidden;
 }
-
 .game-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
 }
-
 .game-card:active { background: var(--surface2); }
 .game-card.disabled { opacity: 0.35; pointer-events: none; }
 
 .card-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
-
-.card-body { padding: 14px 14px 14px 18px; display: flex; align-items: center; gap: 14px; }
+.card-body { padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px; }
 
 .game-icon {
   width: 52px; height: 52px; flex-shrink: 0;
@@ -124,32 +137,49 @@ header {
 .game-icon .ico-fallback { font-size: 28px; }
 
 .game-meta { flex: 1; min-width: 0; }
-.game-name { font-family: 'UnifrakturMaguntia', cursive; font-size: 20px; margin-bottom: 2px; line-height: 1.2; }
-.game-studio { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-.game-bar { height: 3px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 6px; }
+.game-bar { height: 3px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 5px; }
 .game-bar-fill { height: 100%; border-radius: 1px; transition: width 0.4s ease; }
 .game-footer { display: flex; justify-content: space-between; align-items: center; }
-.game-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); }
+.game-count { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); }
 .game-pct { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; flex-shrink: 0; margin-left: 10px; }
+.game-studio { font-family: 'JetBrains Mono', monospace; font-size: 7px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
 
-.status-tag { font-family: 'JetBrains Mono', monospace; font-size: 8px; padding: 3px 7px; border: 1px solid; letter-spacing: 1px; text-transform: uppercase; }
-.s-plat { color: var(--gold);     border-color: var(--gold-dim);        background: rgba(201,168,76,0.08); }
-.s-prog { color: var(--green);    border-color: rgba(76,175,114,0.4);   background: rgba(76,175,114,0.05); }
-.s-new  { color: var(--red3);     border-color: var(--red);             background: rgba(139,26,42,0.08); }
-.s-soon { color: var(--text-dim); border-color: var(--border); }
+.status-tag { font-family: 'JetBrains Mono', monospace; font-size: 7px; padding: 3px 6px; border: 1px solid; letter-spacing: 1px; text-transform: uppercase; }
+.s-100  { color: var(--gold);   border-color: var(--gold-dim); background: rgba(201,168,76,0.08); }
+.s-prog { color: var(--green);  border-color: rgba(76,175,114,0.4); background: rgba(76,175,114,0.05); }
+.s-new  { color: var(--red3);   border-color: var(--red); background: rgba(139,26,42,0.08); }
 
 .coming-label {
-  font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace; font-size: 7px; color: var(--text-dim);
   text-align: center; padding: 5px; border-top: 1px solid var(--border);
   background: var(--surface2); letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* ── Nombre juego — fuente propia por juego ── */
+/* Mina: VT323 — pixel art tipo Game Boy Color, grandes y legibles */
+.name-mina {
+  font-family: 'VT323', monospace;
+  font-size: 28px; margin-bottom: 2px; line-height: 1.1;
+}
+/* Shovel Knight: Press Start 2P — fuente NES auténtica */
+.name-sk {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; margin-bottom: 4px; line-height: 1.6;
+}
+/* 007: Playfair Display italic — estilo créditos Bond */
+.name-007 {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px; margin-bottom: 2px; line-height: 1.2;
 }
 
 .spacer { flex: 1; }
 
 footer {
-  padding: 20px; text-align: center;
-  font-family: 'JetBrains Mono', monospace; font-size: 9px;
-  color: var(--text-dim); letter-spacing: 1px; border-top: 1px solid var(--border);
+  padding: 16px; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 8px;
+  color: var(--text-dim); letter-spacing: 2px;
+  border-top: 1px solid var(--border);
 }
 </style>
 </head>
@@ -160,24 +190,24 @@ footer {
     <div class="header-icon">
       <img src="icon-192.png" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>🏆</div>'">
     </div>
-    <div class="site-title">Game Trackers</div>
-    <div class="site-sub">◈ Joserra · Steam ◈</div>
+    <div class="site-title">Game Achievement<br>Tracker</div>
+    <div class="site-agt">◈ GAT · Steam Edition ◈</div>
   </header>
 
   <div class="global">
     <div class="g-row">
-      <span class="g-label">Progreso total</span>
+      <span class="g-label">Total progress</span>
       <span class="g-num" id="gNum">0 / 0</span>
     </div>
     <div class="g-bar"><div class="g-fill" id="gBar" style="width:0%"></div></div>
     <div class="g-pills">
-      <div class="pill"><span class="pill-val" id="mJuegos">0</span><span class="pill-lbl">Juegos</span></div>
-      <div class="pill"><span class="pill-val" id="mComp">0</span><span class="pill-lbl">Platinos</span></div>
+      <div class="pill"><span class="pill-val" id="mJuegos">0</span><span class="pill-lbl">Games</span></div>
+      <div class="pill"><span class="pill-val" id="mComp">0</span><span class="pill-lbl">Achiever Collector</span></div>
       <div class="pill"><span class="pill-val" id="mPct">0%</span><span class="pill-lbl">Global</span></div>
     </div>
   </div>
 
-  <div class="section-title">◈ Mis juegos</div>
+  <div class="section-title">◈ My Games</div>
 
   <!-- MINA THE HOLLOWER -->
   <a class="game-card" href="mina-the-hollower/index.html">
@@ -188,14 +218,14 @@ footer {
         <span class="ico-fallback" style="display:none">🐭</span>
       </div>
       <div class="game-meta">
-        <div class="game-name" style="color:var(--gold)">Mina the Hollower</div>
+        <div class="name-mina" style="color:var(--gold)">Mina the Hollower</div>
         <div class="game-studio">Yacht Club Games · 2026</div>
         <div class="game-bar">
           <div class="game-bar-fill" id="bar-mina" style="width:0%;background:linear-gradient(90deg,var(--gold-dim),var(--gold))"></div>
         </div>
         <div class="game-footer">
-          <span class="game-count" id="count-mina">0 / 50 logros</span>
-          <span class="status-tag s-prog" id="badge-mina">En progreso</span>
+          <span class="game-count" id="count-mina">0 / 50</span>
+          <span class="status-tag s-prog" id="badge-mina">In progress</span>
         </div>
       </div>
       <div class="game-pct" id="pct-mina" style="color:var(--gold)">0%</div>
@@ -208,31 +238,56 @@ footer {
     <div class="card-body">
       <div class="game-icon">
         <img src="shovel-sprite.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="ico-fallback" style="display:none">⚔️</span>
       </div>
       <div class="game-meta">
-        <div class="game-name" style="color:#4898e8">Shovel Knight</div>
+        <div class="name-sk" style="color:#4898e8">Shovel Knight</div>
         <div class="game-studio">Yacht Club Games · Treasure Trove</div>
         <div class="game-bar">
           <div class="game-bar-fill" id="bar-sk" style="width:0%;background:linear-gradient(90deg,#1a4a98,#4898e8)"></div>
         </div>
         <div class="game-footer">
-          <span class="game-count" id="count-sk">0 / 138 logros</span>
-          <span class="status-tag s-prog" id="badge-sk">Sin empezar</span>
+          <span class="game-count" id="count-sk">0 / 138</span>
+          <span class="status-tag s-new" id="badge-sk">Not started</span>
         </div>
       </div>
       <div class="game-pct" id="pct-sk" style="color:#4898e8">0%</div>
     </div>
   </a>
 
+  <!-- 007 FIRST LIGHT -->
+  <a class="game-card" href="007-first-light/index.html">
+    <div class="card-accent" style="background:#c8a84c"></div>
+    <div class="card-body">
+      <div class="game-icon" style="background:#050508;border-color:#282830;">
+        <img src="007-sprite.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="ico-fallback" style="display:none">🔫</span>
+      </div>
+      <div class="game-meta">
+        <div class="name-007" style="color:#c8a84c">007 First Light</div>
+        <div class="game-studio" style="color:#6878888;">IO Interactive · 2026</div>
+        <div class="game-bar">
+          <div class="game-bar-fill" id="bar-007" style="width:0%;background:linear-gradient(90deg,#8a6820,#c8a84c,#f0d080)"></div>
+        </div>
+        <div class="game-footer">
+          <span class="game-count" id="count-007">0 / 37</span>
+          <span class="status-tag s-new" id="badge-007">Not started</span>
+        </div>
+      </div>
+      <div class="game-pct" id="pct-007" style="color:#c8a84c">0%</div>
+    </div>
+  </a>
+
   <div class="spacer"></div>
-  <footer>Joserra · Game Trackers · 2026</footer>
+  <footer>GAT · Game Achievement Tracker · Steam Edition</footer>
 
 </div>
 
 <script>
 const GAMES = [
-  { id: 'mina', key: 'mina_platinum_v1', total: 50 },
+  { id: 'mina', key: 'mina_platinum_v1', total: 50  },
   { id: 'sk',   key: 'sk_platinum_v1',   total: 138 },
+  { id: '007',  key: 'agt_007_v1',        total: 37  },
 ];
 
 function getProgress(key) {
@@ -247,7 +302,7 @@ function render() {
   let gDone = 0, gTotal = 0, gComp = 0;
 
   GAMES.forEach(g => {
-    const d = getProgress(g.key);
+    const d   = getProgress(g.key);
     const pct = g.total ? Math.round(d / g.total * 100) : 0;
     gDone += d; gTotal += g.total;
     if (d >= g.total) gComp++;
@@ -259,16 +314,16 @@ function render() {
 
     if (ep)  ep.textContent = pct + '%';
     if (eb)  eb.style.width = pct + '%';
-    if (ec)  ec.textContent = d + ' / ' + g.total + ' logros';
+    if (ec)  ec.textContent = d + ' / ' + g.total;
     if (ebg) {
       if (d >= g.total) {
-        ebg.textContent = '🏆 Platino';
-        ebg.className   = 'status-tag s-plat';
+        ebg.textContent = '★ Achiever Collector';
+        ebg.className   = 'status-tag s-100';
       } else if (d > 0) {
-        ebg.textContent = 'En progreso';
+        ebg.textContent = 'In progress';
         ebg.className   = 'status-tag s-prog';
       } else {
-        ebg.textContent = 'Sin empezar';
+        ebg.textContent = 'Not started';
         ebg.className   = 'status-tag s-new';
       }
     }
