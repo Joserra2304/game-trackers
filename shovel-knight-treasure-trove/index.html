@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="manifest" href="/game-trackers/manifest.json">
+<meta name="theme-color" content="#000000">
+<title>SHOVEL KNIGHT — TRACKER</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ── PALETA SHOVEL KNIGHT — sacada de las capturas ──
+   Fondo HUD: negro puro
+   Cielo: azul brillante #4898e8
+   Hierba: verde #38b838
+   Shovel Knight: azul #2870c8 / plateado
+   Plague Knight: verde lima #70b840 / rojo oscuro
+   Specter Knight: morado #7840b8 / cyan #20c8c8
+   King Knight: dorado #e8a020 / marrón
+   Showdown: multicolor
+*/
+:root{
+  --hud-bg:  #000000;
+  --hud-b:   #1a1a1a;
+  --sky:     #4898e8;
+  --sky2:    #78b8f8;
+  --grass:   #38b838;
+  --grass2:  #208820;
+  --dirt:    #a85820;
+  --white:   #f8f8f8;
+  --gray:    #b8b8b8;
+  --dimgray: #787878;
+  /* por campaña */
+  --sk-blue: #2870c8;
+  --sk-silver:#c8d8e8;
+  --pk-green:#70b840;
+  --pk-red:  #c83020;
+  --sp-purp: #9848c8;
+  --sp-cyan: #20c8c8;
+  --kk-gold: #e8a020;
+  --kk-brn:  #885020;
+  --sh-red:  #e83838;
+  --sh-multi:#e8e820;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{background:#000;min-height:100vh;}
+
+.wrap{width:100%;display:flex;flex-direction:column;min-height:100vh;}
+
+/* ── PANTALLA — fondo cielo azul NES ── */
+.screen{
+  flex:1;
+  background:var(--sky);
+  position:relative;overflow:hidden;
+  border-top:4px solid #000;
+}
+
+/* Scanlines NES ligeras */
+.screen::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(180deg,
+    transparent 0,transparent 2px,
+    rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 3px);
+}
+
+.blink{animation:bl .8s steps(1) infinite;}
+@keyframes bl{50%{opacity:0;}}
+
+/* ── HUD SUPERIOR — negro como en el juego ── */
+.hud-bar{
+  background:var(--hud-bg);
+  border-bottom:4px solid #383838;
+  padding:0;
+}
+
+/* Barra de jugadores estilo Showdown */
+.player-bars{
+  display:flex;
+  background:#000;
+  border-bottom:2px solid #383838;
+}
+
+.player-slot{
+  flex:1;
+  padding:4px 6px;
+  border-right:2px solid #383838;
+  display:flex;flex-direction:column;gap:2px;
+}
+.player-slot:last-child{border-right:none;}
+
+.ps-name{
+  font-family:'Press Start 2P',monospace;font-size:5px;
+  letter-spacing:1px;
+  padding:1px 3px;
+  display:inline-block;
+}
+
+.ps-gems{display:flex;gap:2px;margin-top:1px;}
+.gem{
+  width:7px;height:7px;
+  border-radius:1px;
+}
+
+/* Centro: titulo */
+.hud-center{
+  background:#000;
+  padding:8px 8px 6px;text-align:center;
+  border-bottom:2px solid #383838;
+}
+
+.game-title{
+  font-family:'Press Start 2P',monospace;font-size:11px;
+  color:#f8f8f8;
+  text-shadow:2px 2px 0 #383838;
+  letter-spacing:1px;margin-bottom:3px;
+}
+
+.game-sub{
+  font-family:'Press Start 2P',monospace;font-size:7px;
+  color:var(--kk-gold);letter-spacing:2px;margin-bottom:2px;
+}
+
+.game-sub2{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dimgray);letter-spacing:2px;}
+
+/* ── PROGRESO GLOBAL ── */
+.prog-bar-wrap{
+  background:#000;padding:5px 8px;
+  border-bottom:3px solid #383838;
+}
+
+.prog-lbl{
+  display:flex;justify-content:space-between;
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:var(--gray);margin-bottom:3px;
+}
+.prog-lbl span{color:var(--sh-multi);}
+
+.bar-out{
+  height:10px;background:#383838;
+  border:2px solid #585858;overflow:hidden;
+}
+.bar-in{
+  height:100%;
+  background:repeating-linear-gradient(90deg,#e8a020 0,#e8a020 5px,#f8c840 5px,#f8c840 7px);
+  transition:width .3s steps(16);
+}
+
+/* ── TABS — como selector de campaña ── */
+.tab-nav{
+  display:flex;background:#000;
+  border-bottom:4px solid #585858;
+  overflow-x:auto;scrollbar-width:none;
+}
+.tab-nav::-webkit-scrollbar{display:none;}
+
+.tab-btn{
+  flex:1;min-width:52px;
+  padding:5px 2px;border:none;border-right:2px solid #383838;
+  background:#000;color:var(--dimgray);
+  font-family:'Press Start 2P',monospace;font-size:5px;
+  cursor:pointer;text-align:center;
+}
+.tab-btn:last-child{border-right:none;}
+.tab-btn .tn{display:block;font-size:8px;margin-bottom:2px;color:inherit;}
+.tab-btn.active{color:#f8f8f8;}
+.tab-btn[data-tab="0"].active{background:var(--sk-blue);}
+.tab-btn[data-tab="1"].active{background:var(--pk-red);}
+.tab-btn[data-tab="2"].active{background:var(--sp-purp);}
+.tab-btn[data-tab="3"].active{background:var(--kk-brn);}
+.tab-btn[data-tab="4"].active{background:var(--sh-red);}
+.tab-btn[data-tab="all"].active{background:#383838;}
+
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── PLAT BANNER ── */
+.s-plat{
+  display:none;margin:6px;padding:10px 6px;
+  background:#000;border:4px solid var(--sh-multi);
+  text-align:center;animation:bord .8s steps(1) infinite;
+}
+@keyframes bord{50%{border-color:var(--kk-gold);}}
+.s-plat.show{display:block;}
+.plat-ico{font-size:18px;margin-bottom:4px;}
+.plat-txt{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--sh-multi);margin-bottom:3px;}
+.plat-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--kk-gold);}
+
+/* ── CAMPAIGN HEADER — usa el color de cada campaña como fondo ── */
+.camp-hdr{
+  padding:10px 8px 8px;
+  border-bottom:4px solid #000;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Nubes decorativas pixel */
+.camp-hdr::before{
+  content:'';
+  position:absolute;inset:0;
+  opacity:0.15;
+  background:
+    radial-gradient(ellipse 60px 20px at 20% 40%, #fff 0%, transparent 100%),
+    radial-gradient(ellipse 40px 15px at 70% 60%, #fff 0%, transparent 100%);
+  pointer-events:none;
+}
+
+.camp-title{
+  font-family:'Press Start 2P',monospace;font-size:9px;
+  color:#000;text-shadow:1px 1px 0 rgba(255,255,255,0.3);
+  margin-bottom:3px;
+}
+
+.camp-desc{
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:rgba(0,0,0,0.6);line-height:2;margin-bottom:6px;
+}
+
+.camp-prog-row{display:flex;align-items:center;gap:6px;}
+.camp-bar{
+  flex:1;height:8px;background:rgba(0,0,0,0.3);
+  border:2px solid rgba(0,0,0,0.4);overflow:hidden;
+}
+.camp-bar-fill{height:100%;transition:width .3s steps(16);}
+.camp-pct{
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:#000;white-space:nowrap;min-width:36px;text-align:right;
+}
+
+/* ── INFO / WARN BOXES ── */
+.box-info{
+  margin:5px 8px;padding:6px;
+  background:rgba(0,0,0,0.5);border:2px solid var(--sk-silver);
+  box-shadow:2px 2px 0 #000;
+  font-family:'Press Start 2P',monospace;font-size:6px;color:var(--sk-silver);line-height:2;
+}
+.box-warn{
+  margin:5px 8px;padding:6px;
+  background:rgba(200,48,32,0.15);border:2px solid var(--pk-red);
+  box-shadow:2px 2px 0 #000;
+  font-family:'Press Start 2P',monospace;font-size:6px;color:#ff9090;line-height:2;
+}
+.box-ttl{display:block;margin-bottom:3px;letter-spacing:1px;}
+
+/* ── CATEGORY ── */
+.cat{border-bottom:3px solid rgba(0,0,0,0.3);}
+
+.cat-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 8px;
+  cursor:pointer;user-select:none;
+  background:rgba(0,0,0,0.35);
+  border-bottom:2px solid rgba(0,0,0,0.2);
+}
+.cat-hdr:active{background:rgba(0,0,0,0.5);}
+.cat-lft{display:flex;align-items:center;gap:5px;}
+.cat-ico{font-size:11px;}
+.cat-nm{font-family:'Press Start 2P',monospace;font-size:6px;color:#f8f8f8;letter-spacing:1px;text-shadow:1px 1px 0 #000;}
+.cat-rgt{display:flex;align-items:center;gap:5px;font-family:'Press Start 2P',monospace;font-size:6px;color:rgba(255,255,255,0.6);}
+.cat-arr{color:#f8f8f8;font-size:7px;transition:transform .1s steps(3);text-shadow:1px 1px 0 #000;}
+.cat.open .cat-arr{transform:rotate(90deg);}
+.cat-body{display:none;background:rgba(0,0,0,0.55);}
+.cat.open .cat-body{display:block;}
+
+/* ── TROPHY ── */
+.trophy{
+  display:flex;align-items:flex-start;gap:8px;padding:8px;
+  border-bottom:2px solid rgba(0,0,0,0.4);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:rgba(0,0,0,0.45);
+}
+.trophy:last-child{border-bottom:none;}
+.trophy:active{background:rgba(0,0,0,0.65);}
+
+.px-chk{
+  width:12px;height:12px;
+  background:rgba(0,0,0,0.5);border:2px solid var(--gray);
+  box-shadow:2px 2px 0 #000;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:9px;margin-top:2px;color:var(--sh-multi);
+}
+.trophy.done .px-chk{background:var(--grass2);border-color:var(--grass);color:#fff;}
+
+.t-info{flex:1;min-width:0;}
+.t-name{font-family:'Press Start 2P',monospace;font-size:7px;color:#f8f8f8;margin-bottom:3px;line-height:1.8;text-shadow:1px 1px 0 #000;}
+.trophy.done .t-name{color:var(--dimgray);text-decoration:line-through;text-decoration-color:var(--grass);}
+.t-req{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--sky2);line-height:2;margin-bottom:4px;text-shadow:1px 1px 0 #000;}
+.t-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+
+.t-badge{
+  display:inline-block;font-family:'Press Start 2P',monospace;font-size:5px;
+  padding:2px 4px;border:2px solid;box-shadow:2px 2px 0 #000;letter-spacing:1px;
+}
+.d-easy  {color:var(--grass); border-color:var(--grass2);   background:rgba(56,184,56,0.15);}
+.d-medium{color:var(--sh-multi);border-color:#a0a000;       background:rgba(232,232,32,0.1);}
+.d-hard  {color:#ff9840;      border-color:#c05000;          background:rgba(255,152,64,0.1);}
+.d-insane{color:#ff4040;      border-color:var(--pk-red);    background:rgba(200,48,32,0.15);}
+.t-pct{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dimgray);text-shadow:1px 1px 0 #000;}
+
+/* ALL section title */
+.all-ttl{
+  padding:5px 8px;font-family:'Press Start 2P',monospace;font-size:6px;
+  letter-spacing:1px;
+  background:#000;color:var(--kk-gold);
+  border-bottom:2px solid #383838;border-top:2px solid #383838;
+}
+
+/* ── RESET ── */
+.reset-wrap{padding:10px 8px;text-align:center;background:#000;border-top:3px solid #383838;}
+.px-btn{
+  background:#000;border:2px solid var(--pk-red);box-shadow:3px 3px 0 #000;
+  color:var(--pk-red);font-family:'Press Start 2P',monospace;font-size:6px;
+  padding:7px 10px;cursor:pointer;letter-spacing:1px;
+}
+.px-btn:active{transform:translate(3px,3px);box-shadow:none;}
+
+.s-footer{
+  padding:5px 8px;text-align:center;font-family:'Press Start 2P',monospace;
+  font-size:5px;color:var(--dimgray);border-top:2px solid #383838;background:#000;
+}
+
+/* ── BARRA BOTONES — carcasa NES gris ── */
+.controls-bar{
+  background:#c0b8b0;
+  border-top:4px solid #706860;
+  padding:10px 16px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  box-shadow:inset 0 2px 0 #e0d8d0,inset 0 -3px 0 #706860;
+}
+.dpad{width:48px;height:48px;position:relative;flex-shrink:0;}
+.dpad-h,.dpad-v{
+  position:absolute;background:#585050;border-radius:2px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.15),0 2px 0 rgba(0,0,0,0.4);
+}
+.dpad-h{width:100%;height:34%;top:33%;left:0;}
+.dpad-v{width:34%;height:100%;top:0;left:33%;}
+.dpad-ctr{position:absolute;width:34%;height:34%;top:33%;left:33%;background:#585050;}
+
+.mid-btns{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.mini-row{display:flex;gap:14px;}
+.mini-btn{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.mini-oval{
+  background:#706860;width:24px;height:7px;border-radius:4px;
+  box-shadow:0 2px 0 rgba(0,0,0,0.3);transform:rotate(-15deg);
+}
+.mini-lbl{font-family:'Press Start 2P',monospace;font-size:4px;color:rgba(0,0,0,0.4);letter-spacing:1px;}
+
+.ab-wrap{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.btn-b,.btn-a{
+  border-radius:50%;
+  box-shadow:0 3px 0 rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.2);
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:rgba(255,255,255,0.85);
+  display:flex;align-items:center;justify-content:center;cursor:default;
+}
+.btn-b{width:28px;height:28px;background:#8020a0;margin-top:12px;}
+.btn-a{width:32px;height:32px;background:#c82020;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="screen">
+
+  <!-- HUD negro estilo Showdown -->
+  <div class="hud-bar">
+    <!-- Mini barras de campaña estilo P1/P2/P3/P4 del Showdown -->
+    <div class="player-bars">
+      <div class="player-slot">
+        <span class="ps-name" style="background:var(--sk-blue);color:#fff">-SHOVEL-</span>
+        <div class="ps-gems" id="gems-sk"></div>
+      </div>
+      <div class="player-slot">
+        <span class="ps-name" style="background:var(--pk-red);color:#fff">-PLAGUE-</span>
+        <div class="ps-gems" id="gems-pk"></div>
+      </div>
+      <div class="player-slot">
+        <span class="ps-name" style="background:var(--sp-purp);color:#fff">-SPECTER-</span>
+        <div class="ps-gems" id="gems-sp"></div>
+      </div>
+      <div class="player-slot">
+        <span class="ps-name" style="background:var(--kk-gold);color:#000">-KING-</span>
+        <div class="ps-gems" id="gems-kk"></div>
+      </div>
+      <div class="player-slot">
+        <span class="ps-name" style="background:var(--sh-red);color:#fff">-SHOW-</span>
+        <div class="ps-gems" id="gems-sh"></div>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div class="game-title">SHOVEL KNIGHT</div>
+      <div class="game-sub">&#9670; TREASURE TROVE &#9670;</div>
+      <div class="game-sub2">ACHIEVEMENT TRACKER <span class="blink">&#9608;</span></div>
+    </div>
+  </div>
+
+  <div class="prog-bar-wrap">
+    <div class="prog-lbl">PROGRESO TOTAL <span id="gPct">0%</span></div>
+    <div class="bar-out"><div class="bar-in" id="gBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="0" onclick="showTab('0')"><span class="tn">&#9824;</span>SHOVEL</button>
+    <button class="tab-btn" data-tab="1" onclick="showTab('1')"><span class="tn">&#9825;</span>PLAGUE</button>
+    <button class="tab-btn" data-tab="2" onclick="showTab('2')"><span class="tn">&#9830;</span>SPECTER</button>
+    <button class="tab-btn" data-tab="3" onclick="showTab('3')"><span class="tn">&#9827;</span>KING</button>
+    <button class="tab-btn" data-tab="4" onclick="showTab('4')"><span class="tn">&#9733;</span>SHOW</button>
+    <button class="tab-btn" data-tab="all" onclick="showTab('all')"><span class="tn">&#9632;</span>ALL</button>
+  </div>
+
+  <div class="s-plat" id="platBanner">
+    <div class="plat-ico">&#9733;</div>
+    <div class="plat-txt">TREASURE COMPLETE!</div>
+    <div class="plat-sub">138/138 ACHIEVEMENTS</div>
+  </div>
+
+  <div id="tab-0"   class="tab-content active"></div>
+  <div id="tab-1"   class="tab-content"></div>
+  <div id="tab-2"   class="tab-content"></div>
+  <div id="tab-3"   class="tab-content"></div>
+  <div id="tab-4"   class="tab-content"></div>
+  <div id="tab-all" class="tab-content"></div>
+
+  <div class="reset-wrap">
+    <button class="px-btn" onclick="resetAll()">&#9632; RESET &#9632;</button>
+  </div>
+  <div class="s-footer">JOSERRA &#9632; SHOVEL KNIGHT TRACKER &#9632; 2026</div>
+</div>
+
+<!-- Carcasa NES gris -->
+<div class="controls-bar">
+  <div class="dpad"><div class="dpad-h"></div><div class="dpad-v"></div><div class="dpad-ctr"></div></div>
+  <div class="mid-btns">
+    <div class="mini-row">
+      <div class="mini-btn"><div class="mini-oval"></div><div class="mini-lbl">SELECT</div></div>
+      <div class="mini-btn"><div class="mini-oval"></div><div class="mini-lbl">START</div></div>
+    </div>
+  </div>
+  <div class="ab-wrap">
+    <div class="btn-b">B</div>
+    <div class="btn-a">A</div>
+  </div>
+</div>
+</div>
+
+<script>
+const SK_KEY='sk_platinum_v1';
+const DLBL={easy:'FACIL',medium:'NORMAL',hard:'DIFICIL',insane:'EXTREMO'};
+
+const CAMPANAS=[
+  {
+    id:0,tab:'0',name:'SHOVEL OF HOPE',
+    col:'#2870c8',colbg:'linear-gradient(180deg,#4898e8 0%,#78b8f8 100%)',
+    desc:'La campana principal. 3 partidas recomendadas.',
+    info:'P1: Historia + coleccion + reliquias. P2: NG+ + Impossible + Perfect Platformer + Checkpointless. P3 (save nuevo): HurryUp sub-1h30 + True Shovelry sin reliquias + Penny Pincher.',
+    warn:null,
+    cats:[
+      {ico:'🏆',nm:'HISTORIA',ts:[
+        {id:'sk-victory',      nm:'Victory!',          req:'Termina el juego.',                                    dif:'easy',  pct:'40%'},
+        {id:'sk-halfway',      nm:'Halfway',            req:'Derrota 4 de la Orden de No Quarter.',                 dif:'easy',  pct:'60%'},
+        {id:'sk-first-buy',    nm:'First Purchase',     req:'Compra tu primer objeto.',                             dif:'easy',  pct:'95%'},
+        {id:'sk-only-you',     nm:'Only You',           req:'Ten cuidado con las hogueras.',                        dif:'easy',  pct:'88%'},
+        {id:'sk-troupple',     nm:'Troupple Acolyte',   req:'Descubre los secretos del Rey Troupple.',              dif:'easy',  pct:'67%'},
+        {id:'sk-hall',         nm:'Hall Champion',      req:'Resuelve los problemas del Salon de Campeones.',        dif:'easy',  pct:'45%'},
+        {id:'sk-well-met',     nm:'Well Met',           req:'Derrota a todos los viajeros errantes.',               dif:'easy',  pct:'47%'},
+        {id:'sk-juggler',      nm:'Juggler',            req:'Impresiona a Mona con tus habilidades.',               dif:'easy',  pct:'51%'},
+        {id:'sk-hooper',       nm:'Hooper',             req:'Rebota en el aro del Hoop Kid 5 segundos.',            dif:'easy',  pct:'27%'},
+        {id:'sk-pungent',      nm:'Pungent',            req:'Escucha todos los chistes de Croaker.',                dif:'easy',  pct:'20%'},
+      ]},
+      {ico:'💰',nm:'COLECCION',ts:[
+        {id:'sk-decked-out',   nm:'Decked Out',         req:'Compra o desbloquea todas las reliquias, equipo y mejoras.',dif:'medium',pct:'20%'},
+        {id:'sk-master-shovel',nm:'Master Shoveler',    req:'Compra todas las mejoras del Shovel Blade.',           dif:'medium',pct:'46%'},
+        {id:'sk-ichor',        nm:'I Scream For Ichor', req:'Prueba cada elixir del Rey Troupple.',                 dif:'medium',pct:'29%'},
+        {id:'sk-music',        nm:'Music Lover',        req:'Consigue todos los pergaminos de musica.',             dif:'medium',pct:'8%'},
+        {id:'sk-big-spender',  nm:'Hey Big Spender',    req:'Gasta 25000 de oro en la tienda en total.',            dif:'easy',  pct:'62%'},
+        {id:'sk-order-hoarder',nm:'Order of Hoarders',  req:'Ten 50000 de oro a la vez.',                           dif:'medium',pct:'7%'},
+        {id:'sk-fishing',      nm:'Master Angler',      req:'Pesca con exito 5 zonas brillantes.',                  dif:'easy',  pct:'47%'},
+        {id:'sk-nice-hat',     nm:'Nice Hat...',        req:'Ayuda a todos los gorrones de la tienda elegante.',    dif:'easy',  pct:'55%'},
+      ]},
+      {ico:'🔮',nm:'RELIQUIAS',ts:[
+        {id:'sk-relic-rt',     nm:'Relic Roundtable',   req:'Mata un enemigo con cada reliquia.',                   dif:'medium',pct:'13%'},
+        {id:'sk-reflect',      nm:'Reflect Lord',       req:'Golpea enemigos con proyectil reflejado 30 veces.',    dif:'medium',pct:'16%'},
+        {id:'sk-flare',        nm:'Flare Wander',       req:'Mata enemigo con Flare Wand desde mas de 25 bloques.', dif:'medium',pct:'7%'},
+        {id:'sk-phase',        nm:'Another Dimension',  req:'Recoge 2000 oro en pinchos usando Phase Locket.',      dif:'medium',pct:'26%'},
+        {id:'sk-chaos',        nm:'Super Sphere',       req:'Destruye 5 enemigos en 5s con Chaos Spheres.',         dif:'medium',pct:'9%'},
+        {id:'sk-knuckle',      nm:'Knuckle Down',       req:'Permanece en el aire 4s con Dust Knuckles.',           dif:'medium',pct:'22%'},
+        {id:'sk-coin',         nm:'Reflected Riches',   req:'Rebota la misma Alchemical Coin 5 veces seguidas.',    dif:'medium',pct:'7%'},
+        {id:'sk-anchor',       nm:'Arc of Iron',        req:'Mata 3 enemigos con un solo Throwing Anchor.',         dif:'medium',pct:'20%'},
+        {id:'sk-propeller',    nm:'Flying Feat',        req:'Mata 3 enemigos con Propeller Dagger sin tocar suelo.',dif:'medium',pct:'8%'},
+        {id:'sk-horn',         nm:'Boom!',              req:'Mata 5 enemigos a la vez con el Booming Horn.',        dif:'medium',pct:'17%'},
+        {id:'sk-gear',         nm:'Clearing a Path',    req:'Atropella 5 enemigos con el mismo Mobile Gear.',       dif:'hard',  pct:'6%'},
+      ]},
+      {ico:'💀',nm:'RETOS',ts:[
+        {id:'sk-alive',        nm:"I'm Alive!",         req:'Termina un nivel sin morir.',                          dif:'easy',  pct:'46%'},
+        {id:'sk-nodamage',     nm:'No Damage!',         req:'Termina un nivel sin recibir daño.',                   dif:'hard',  pct:'9%'},
+        {id:'sk-untouched',    nm:'Untouched',          req:'Derrota un Caballero de No Quarter sin daño.',         dif:'hard',  pct:'10%'},
+        {id:'sk-get-point',    nm:'Get the Point',      req:'Destruye todos los checkpoints de un nivel.',          dif:'medium',pct:'18%'},
+        {id:'sk-on-diet',      nm:'On a Diet',          req:'Termina un nivel sin comer comida.',                   dif:'easy',  pct:'18%'},
+        {id:'sk-shovel-eco',   nm:'Shovel Economy',     req:'Termina un nivel con menos de 20 golpes de pala.',     dif:'hard',  pct:'10%'},
+        {id:'sk-dirt-poor',    nm:'Dirt Poor',          req:'No recojas oro en un nivel completo de la Orden.',     dif:'hard',  pct:'5%'},
+        {id:'sk-sparker',      nm:'Sparker',            req:'Derrota un jefe con la tecnica Ground Spark.',         dif:'medium',pct:'17%'},
+        {id:'sk-you-fired',    nm:"You're Fired",       req:'Derrota al Black Knight con un disparo reflejado.',    dif:'medium',pct:'19%'},
+      ]},
+      {ico:'⚡',nm:'CHALLENGE — P2/P3',ts:[
+        {id:'sk-again',        nm:'Again!',             req:'Termina New Game Plus.',                               dif:'medium',pct:'4%'},
+        {id:'sk-impossible',   nm:'Impossible!',        req:'Termina el juego sin morir.',                          dif:'insane',pct:'2%'},
+        {id:'sk-perfect',      nm:'Perfect Platformer', req:'Termina sin caer en pozos sin fondo.',                 dif:'insane',pct:'2%'},
+        {id:'sk-checkless',    nm:'Checkpointless',     req:'Destruye todos los checkpoints posibles.',             dif:'hard',  pct:'3%'},
+        {id:'sk-penny',        nm:'Penny Pincher',      req:'Termina sin gastar dinero. Save nuevo recomendado.',   dif:'hard',  pct:'3%'},
+        {id:'sk-true-shovelry',nm:'True Shovelry',      req:'Termina sin coger ninguna reliquia. SAVE NUEVO.',      dif:'hard',  pct:'3%'},
+        {id:'sk-hurryup',      nm:'HurryUp!',           req:'Termina en menos de 1h 30min. SAVE NUEVO.',            dif:'hard',  pct:'2%'},
+      ]},
+    ]
+  },
+  {
+    id:1,tab:'1',name:'PLAGUE OF SHADOWS',
+    col:'#c83020',colbg:'linear-gradient(180deg,#203820 0%,#305028 100%)',
+    desc:'Campaña de Plague Knight. 2-3 partidas.',
+    info:'P1: Historia + coleccion. P2: NG+ + retos especiales. P3 (save nuevo): Speedrun + Penny Pincher + Naked Plague.',
+    warn:'Naked Plague, Penny Pincher y True Shovelry requieren saves nuevos — son incompatibles en una sola run.',
+    cats:[
+      {ico:'🏆',nm:'HISTORIA',ts:[
+        {id:'pk-victory',      nm:'Victory!',           req:'Termina el juego.',                                    dif:'easy',  pct:'13%'},
+        {id:'pk-trading',      nm:'Trading Up',         req:'Intercambia todas las reliquias inútiles con Chester.',dif:'medium',pct:'8%'},
+        {id:'pk-hang',         nm:'Hang Time',          req:'Permanece en el aire 10s sin aterrizar.',              dif:'medium',pct:'6%'},
+        {id:'pk-defend',       nm:'Defend the Lab!',    req:'Recupera el Explodatorium sin romper bloques grises.', dif:'hard',  pct:'2%'},
+      ]},
+      {ico:'💰',nm:'COLECCION',ts:[
+        {id:'pk-mint',         nm:'Mint Condition',     req:'Consigue todas las Cipher Coins.',                     dif:'medium',pct:'4%'},
+        {id:'pk-maxed',        nm:'Maxed Out',          req:'Compra o desbloquea todo el equipo.',                  dif:'medium',pct:'8%'},
+        {id:'pk-hall',         nm:'Hall Villain',       req:'Completa el Hall of Champions en 3m 30s o menos.',     dif:'hard',  pct:'7%'},
+      ]},
+      {ico:'💣',nm:'RETOS',ts:[
+        {id:'pk-bomb-jump',    nm:'Bomb Jump Blitz',    req:'Derrota un Caballero de la Orden solo con explosiones.',dif:'hard', pct:'2%'},
+        {id:'pk-nodamage',     nm:'No Damage!',         req:'Termina un nivel sin recibir daño.',                   dif:'hard',  pct:'2%'},
+        {id:'pk-untouched',    nm:'Untouched',          req:'Derrota un Caballero sin daño (salvo King Knight).',   dif:'hard',  pct:'2%'},
+      ]},
+      {ico:'⚡',nm:'CHALLENGE',ts:[
+        {id:'pk-again',        nm:'Again!',             req:'Termina New Game Plus.',                               dif:'medium',pct:'1%'},
+        {id:'pk-penny',        nm:'Penny Pincher',      req:'Termina sin gastar dinero ni Cipher Coins.',           dif:'insane',pct:'1%'},
+        {id:'pk-naked',        nm:'Naked Plague',       req:'Termina sin recoger arcana, partes de bomba ni armadura.',dif:'insane',pct:'1%'},
+        {id:'pk-hurryup',      nm:'Hurry Up!',          req:'Termina en menos de 1h 30min.',                        dif:'insane',pct:'1%'},
+        {id:'pk-checkless',    nm:'Checkpointless',     req:'Destruye todos los checkpoints posibles.',             dif:'hard',  pct:'1%'},
+      ]},
+    ]
+  },
+  {
+    id:2,tab:'2',name:'SPECTER OF TORMENT',
+    col:'#9848c8',colbg:'linear-gradient(180deg,#18083a 0%,#300860 100%)',
+    desc:'Campaña de Specter Knight. 2 partidas.',
+    info:'P1: Historia + coleccion + retos generales. P2: NG+ + retos de dificultad.',
+    warn:null,
+    cats:[
+      {ico:'🏆',nm:'HISTORIA',ts:[
+        {id:'sp-victory',      nm:'Victory!',           req:'Termina el juego.',                                    dif:'easy',  pct:'11%'},
+        {id:'sp-collection',   nm:'Soul Collector',     req:'Recluta a todos los caballeros.',                      dif:'medium',pct:'9%'},
+        {id:'sp-reaper',       nm:'Efficient Reaper',   req:'Completa el Lich Yard sin fallar ningun salto de guadaña.',dif:'hard',pct:'5%'},
+      ]},
+      {ico:'💰',nm:'COLECCION',ts:[
+        {id:'sp-curio',        nm:'Curio Collector',    req:'Obtén todas las Curios.',                              dif:'medium',pct:'6%'},
+        {id:'sp-upgrade',      nm:'Full Arsenal',       req:'Desbloquea todas las mejoras.',                        dif:'medium',pct:'5%'},
+        {id:'sp-chips',        nm:'Chip In',            req:'Recoge todas las Darkness Chips.',                     dif:'medium',pct:'5%'},
+      ]},
+      {ico:'⚡',nm:'RETOS',ts:[
+        {id:'sp-nodamage',     nm:'No Damage!',         req:'Termina un nivel sin recibir daño.',                   dif:'hard',  pct:'3%'},
+        {id:'sp-untouched',    nm:'Untouched',          req:'Derrota un Caballero sin recibir daño.',               dif:'hard',  pct:'3%'},
+        {id:'sp-again',        nm:'Again!',             req:'Termina New Game Plus.',                               dif:'medium',pct:'1%'},
+        {id:'sp-deathless',    nm:'Deathless',          req:'Termina sin morir.',                                   dif:'insane',pct:'1%'},
+        {id:'sp-penny',        nm:'Penny Pincher',      req:'Termina sin gastar dinero.',                           dif:'hard',  pct:'1%'},
+        {id:'sp-hurryup',      nm:'Hurry Up!',          req:'Termina en menos de 1 hora.',                          dif:'hard',  pct:'1%'},
+        {id:'sp-checkless',    nm:'Checkpointless',     req:'Destruye todos los checkpoints.',                      dif:'hard',  pct:'1%'},
+      ]},
+    ]
+  },
+  {
+    id:3,tab:'3',name:'KING OF CARDS',
+    col:'#e8a020',colbg:'linear-gradient(180deg,#604010 0%,#402808 100%)',
+    desc:'Campaña de King Knight. 2 partidas.',
+    info:'P1: Historia + Joustus + coleccion. P2: NG+ + retos de dificultad.',
+    warn:null,
+    cats:[
+      {ico:'♟️',nm:'JOUSTUS',ts:[
+        {id:'kk-joustus',      nm:'Joustus Champ',      req:'Derrota a todos los jugadores de Joustus.',            dif:'medium',pct:'7%'},
+        {id:'kk-sweep',        nm:'Sweeping Victory',   req:'Gana una partida de Joustus sin perder cartas.',       dif:'medium',pct:'5%'},
+        {id:'kk-combo',        nm:'Joustus Combo',      req:'Empuja 3 cartas del oponente fuera del tablero en un movimiento.',dif:'hard',pct:'4%'},
+      ]},
+      {ico:'👑',nm:'HISTORIA',ts:[
+        {id:'kk-victory',      nm:'Victory!',           req:'Termina el juego.',                                    dif:'easy',  pct:'10%'},
+        {id:'kk-collect',      nm:'Royal Collection',   req:'Consigue todas las cartas de Joustus.',                dif:'medium',pct:'5%'},
+        {id:'kk-spin',         nm:'Spin to Win',        req:'Derrota a 10 enemigos en una sola sesion de giro.',    dif:'medium',pct:'8%'},
+      ]},
+      {ico:'⚡',nm:'RETOS',ts:[
+        {id:'kk-nodamage',     nm:'No Damage!',         req:'Termina un nivel sin recibir daño.',                   dif:'hard',  pct:'3%'},
+        {id:'kk-untouched',    nm:'Untouched',          req:'Derrota un Caballero sin recibir daño.',               dif:'hard',  pct:'3%'},
+        {id:'kk-again',        nm:'Again!',             req:'Termina New Game Plus.',                               dif:'medium',pct:'1%'},
+        {id:'kk-deathless',    nm:'Deathless',          req:'Termina sin morir.',                                   dif:'insane',pct:'1%'},
+        {id:'kk-penny',        nm:'Penny Pincher',      req:'Termina sin gastar dinero.',                           dif:'hard',  pct:'1%'},
+        {id:'kk-hurryup',      nm:'Hurry Up!',          req:'Termina en menos de 1h 30min.',                        dif:'hard',  pct:'1%'},
+        {id:'kk-checkless',    nm:'Checkpointless',     req:'Destruye todos los checkpoints.',                      dif:'hard',  pct:'1%'},
+      ]},
+    ]
+  },
+  {
+    id:4,tab:'4',name:'SHOWDOWN',
+    col:'#e83838',colbg:'linear-gradient(180deg,#1a0808 0%,#380808 100%)',
+    desc:'Modo lucha. Un logro especifico por personaje.',
+    info:'Todos se pueden hacer contra la CPU en dificultad facil. No requieren online.',
+    warn:'Necesitas jugar con cada uno de los personajes y ganar usando su habilidad especifica.',
+    cats:[
+      {ico:'⚔️',nm:'PERSONAJES',ts:[
+        {id:'sh-shovel',      nm:'Dig Victory',         req:'Como Shovel Knight, gana con proyectil reflejado.',     dif:'medium',pct:'10%'},
+        {id:'sh-plague',      nm:'Spinning Plague',     req:'Como Plague Knight, derrota varios foes con Spin Burst.',dif:'medium',pct:'7%'},
+        {id:'sh-specter',     nm:'From the Shadows',    req:'Como Specter Knight, gana con Dash Slash a un foso.',   dif:'medium',pct:'8%'},
+        {id:'sh-king',        nm:'Still Spinning',      req:'Como King Knight, llega a la gema ganadora girando.',   dif:'medium',pct:'8%'},
+        {id:'sh-shield',      nm:'Stay Where You Are!', req:'Como Shield Knight, bloquea y gana con Shield Rush.',   dif:'medium',pct:'6%'},
+        {id:'sh-black',       nm:'From Shadow!',        req:'Como Black Knight, gana esquivando y con Dark Wave.',   dif:'medium',pct:'6%'},
+        {id:'sh-propeller',   nm:'Aerial Ace',          req:'Como Propeller Knight, derrota 2+ sin tocar suelo.',    dif:'medium',pct:'7%'},
+        {id:'sh-mole',        nm:'Tank!',               req:'Como Mole Knight, absorbe 10 golpes bajo tierra.',      dif:'medium',pct:'5%'},
+        {id:'sh-treasure',    nm:'Diamond Bounce',      req:'Como Treasure Knight, gana con un diamante rebotado.',  dif:'medium',pct:'5%'},
+        {id:'sh-polar',       nm:'Ice Cold',            req:'Como Polar Knight, congela a todos los jugadores.',     dif:'medium',pct:'5%'},
+        {id:'sh-tinker',      nm:'Tinkered Up',         req:'Como Tinker Knight, gana usando solo el tanque.',       dif:'medium',pct:'5%'},
+        {id:'sh-flurry',      nm:'Card Shark',          req:'Como Madame Meeber, gana desde lejos.',                 dif:'medium',pct:'5%'},
+        {id:'sh-battletoads', nm:'Battletoads!',        req:'Como Battletoads, derrota foes con Double Dragon.',     dif:'medium',pct:'4%'},
+        {id:'sh-yacht',       nm:'Ship Shape',          req:'Completa todos los logros de Showdown.',                dif:'hard',  pct:'2%'},
+      ]},
+    ]
+  },
+];
+
+// ── STATE ─────────────────────────────────────────────────
+let ch={};
+function load(){try{const s=localStorage.getItem(SK_KEY);if(s)ch=JSON.parse(s);}catch(e){ch={};}}
+function save(){try{localStorage.setItem(SK_KEY,JSON.stringify(ch));}catch(e){}}
+function tog(id){ch[id]=!ch[id];save();render();}
+function resetAll(){ch={};save();render();}
+function allTs(){return CAMPANAS.flatMap(c=>c.cats.flatMap(cat=>cat.ts));}
+function total(){return allTs().length;}
+function dn(){return Object.values(ch).filter(Boolean).length;}
+
+// Gemas de progreso por campaña (5 gemas = barra completa)
+function buildGems(campId, done, tot){
+  const pct = tot?done/tot:0;
+  const filled = Math.round(pct*5);
+  const col = CAMPANAS[campId].col;
+  return Array.from({length:5},(_,i)=>
+    `<div class="gem" style="background:${i<filled?col:'#383838'};box-shadow:${i<filled?`0 0 4px ${col}`:''} 1px 1px 0 #000"></div>`
+  ).join('');
+}
+
+// ── BUILD ─────────────────────────────────────────────────
+function bT(t){
+  const ok=!!ch[t.id];
+  return`<div class="trophy${ok?' done':''}" onclick="tog('${t.id}')">
+<div class="px-chk">${ok?'&#10003;':''}</div>
+<div class="t-info">
+  <div class="t-name">${t.nm}</div>
+  <div class="t-req">${t.req}</div>
+  <div class="t-meta">
+    <span class="t-badge d-${t.dif}">${DLBL[t.dif]}</span>
+    <span class="t-pct">STEAM:${t.pct}</span>
+  </div>
+</div>
+</div>`;}
+
+function bCats(cats,pi){
+  return cats.map((c,ci)=>{
+    const id=`c${pi}_${ci}`,cd=c.ts.filter(t=>ch[t.id]).length;
+    return`<div class="cat open" id="${id}">
+<div class="cat-hdr" onclick="tc('${id}')">
+  <div class="cat-lft"><span class="cat-ico">${c.ico}</span><span class="cat-nm">${c.nm}</span></div>
+  <div class="cat-rgt"><span>${cd}/${c.ts.length}</span><span class="cat-arr">&#9658;</span></div>
+</div>
+<div class="cat-body">${c.ts.map(t=>bT(t)).join('')}</div>
+</div>`;}).join('');}
+
+function bCamp(camp){
+  const all=camp.cats.flatMap(c=>c.ts);
+  const d=all.filter(t=>ch[t.id]).length;
+  const pct=all.length?Math.round(d/all.length*100):0;
+  // Color de barra campana
+  const barStyle=`background:repeating-linear-gradient(90deg,${camp.col} 0,${camp.col} 5px,rgba(0,0,0,0.3) 5px,rgba(0,0,0,0.3) 7px)`;
+  let h=`<div class="camp-hdr" style="background:${camp.colbg}">
+<div class="camp-title" style="color:${camp.col};text-shadow:1px 1px 0 #000">&#9658; ${camp.name}</div>
+<div class="camp-desc">${camp.desc}</div>
+<div class="camp-prog-row">
+  <div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%;${barStyle}"></div></div>
+  <div class="camp-pct" style="color:${camp.col}">${d}/${all.length}</div>
+</div>
+</div>`;
+  if(camp.info) h+=`<div class="box-info"><span class="box-ttl">&#9658; GUIA DE PARTIDAS</span>${camp.info}</div>`;
+  if(camp.warn) h+=`<div class="box-warn"><span class="box-ttl">&#9658; ATENCION</span>${camp.warn}</div>`;
+  h+=bCats(camp.cats,camp.id);
+  return h;
+}
+
+function bAll(){
+  let h='';
+  CAMPANAS.forEach(camp=>{
+    h+=`<div class="all-ttl" style="color:${camp.col}">&#9658; ${camp.name}</div>`;
+    camp.cats.forEach(c=>c.ts.forEach(t=>{h+=bT(t);}));
+  });
+  const ok=dn()>=total();
+  h+=`<div class="all-ttl" style="color:var(--sh-multi)">&#9658; 100% COMPLETE</div>
+<div class="trophy${ok?' done':''}">
+<div class="px-chk">${ok?'&#10003;':''}</div>
+<div class="t-info">
+  <div class="t-name">TREASURE COMPLETE</div>
+  <div class="t-req">Consigue los 138 logros</div>
+  <div class="t-meta"><span class="t-badge d-insane">EXTREMO</span><span class="t-pct">STEAM:~0.8%</span></div>
+</div>
+</div>`;
+  return h;
+}
+
+function render(){
+  const d=dn(),tot=total(),pct=tot?Math.round(d/tot*100):0;
+
+  // Gemas por campaña en HUD
+  CAMPANAS.forEach(camp=>{
+    const el=document.getElementById('gems-'+['sk','pk','sp','kk','sh'][camp.id]);
+    if(!el)return;
+    const all=camp.cats.flatMap(c=>c.ts);
+    const cd=all.filter(t=>ch[t.id]).length;
+    el.innerHTML=buildGems(camp.id,cd,all.length);
+  });
+
+  const gb=document.getElementById('gBar');if(gb)gb.style.width=pct+'%';
+  const gp=document.getElementById('gPct');if(gp)gp.textContent=pct+'%';
+  document.getElementById('platBanner').classList.toggle('show',d>=tot);
+
+  CAMPANAS.forEach(camp=>{
+    document.getElementById('tab-'+camp.tab).innerHTML=bCamp(camp);
+  });
+  document.getElementById('tab-all').innerHTML=bAll();
+}
+
+function tc(id){document.getElementById(id).classList.toggle('open');}
+function showTab(t){
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelector(`[data-tab="${t}"]`).classList.add('active');
+}
+
+load();render();
+</script>
+</body>
+</html>
