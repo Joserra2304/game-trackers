@@ -1,1 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="manifest" href="/game-trackers/manifest.json">
+<meta name="theme-color" content="#050508">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AGT">
+<link rel="apple-touch-icon" href="/game-trackers/icon-192.png">
+<title>007 FIRST LIGHT — AGT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
+/* ── PALETA JAMES BOND
+   Fondo: negro profundo
+   Dorado: #c8a84c (pistola dorada)
+   Plateado: #a8b8c8
+   Rojo: #8b0a14 (peligro)
+   Blanco roto: #e8e0d0
+   Gris: #383838
+*/
+:root{
+  --bg:    #050508;
+  --bg2:   #0a0a10;
+  --panel: #101018;
+  --panel2:#181820;
+  --border:#282830;
+  --gold:  #c8a84c;
+  --gold2: #8a6820;
+  --gold3: #f0d080;
+  --silver:#a8b8c8;
+  --silver2:#6878888;
+  --red:   #8b0a14;
+  --red2:  #c01020;
+  --white: #e8e0d0;
+  --dim:   #585868;
+  --teal:  #208878; /* Q-Branch verde */
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{background:#000;min-height:100vh;}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* ── GUN BARREL SCANLINES ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(180deg,
+    transparent 0,transparent 4px,
+    rgba(0,0,0,0.12) 4px,rgba(0,0,0,0.12) 5px);
+}
+
+/* Viñeta circular estilo gun barrel */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.7) 100%);
+}
+
+.app{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;}
+
+/* ── HEADER — estilo título Bond ── */
+header{
+  padding:0;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+  position:relative;
+}
+
+/* Fondo gun barrel */
+.gun-barrel{
+  background:
+    radial-gradient(circle at 50% 120%, rgba(200,168,76,0.08) 0%, transparent 60%),
+    linear-gradient(180deg,#000 0%,var(--bg2) 100%);
+  padding:36px 20px 24px;
+  text-align:center;
+  position:relative;
+}
+
+/* Círculo decorativo gun barrel */
+.gun-barrel::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:180px;height:180px;
+  border-radius:50%;
+  border:1px solid rgba(200,168,76,0.08);
+  pointer-events:none;
+}
+.gun-barrel::after{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:120px;height:120px;
+  border-radius:50%;
+  border:1px solid rgba(200,168,76,0.05);
+  pointer-events:none;
+}
+
+.bond-number{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--gold);
+  letter-spacing:6px;
+  margin-bottom:6px;
+  text-shadow:0 0 20px rgba(200,168,76,0.4);
+}
+
+.bond-title{
+  font-family:'Playfair Display',serif;
+  font-size:30px;
+  font-style:italic;
+  color:var(--white);
+  text-shadow:0 0 30px rgba(200,168,76,0.2),2px 2px 0 rgba(0,0,0,0.8);
+  letter-spacing:2px;
+  margin-bottom:4px;
+  line-height:1.1;
+}
+
+.bond-sub{
+  font-size:7px;
+  color:var(--gold2);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:2px;
+}
+
+.bond-edition{
+  font-size:6px;
+  color:var(--dim);
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+
+/* ── PROGRESS ── */
+.prog-wrap{
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;
+}
+
+.prog-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:6px;
+}
+
+.prog-lbl{font-size:7px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
+.prog-val{font-size:11px;font-weight:700;color:var(--gold);}
+
+.prog-bar{
+  height:4px;
+  background:var(--border);
+  border-radius:1px;overflow:hidden;
+  margin-bottom:12px;
+}
+.prog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold2),var(--gold),var(--gold3));
+  border-radius:1px;
+  transition:width 0.5s ease;
+}
+
+.stat-row{display:flex;gap:8px;}
+.stat-box{
+  flex:1;padding:8px 6px;
+  background:var(--panel2);border:1px solid var(--border);
+  text-align:center;
+}
+.stat-val{display:block;font-size:13px;font-weight:700;color:var(--white);margin-bottom:2px;}
+.stat-lbl{display:block;font-size:5px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── TABS — como misiones Bond ── */
+.tab-nav{
+  display:flex;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+.tab-nav::-webkit-scrollbar{display:none;}
+
+.tab-btn{
+  flex:1;min-width:68px;
+  padding:8px 2px;border:none;border-right:1px solid var(--border);
+  background:transparent;color:var(--dim);
+  font-family:'JetBrains Mono',monospace;font-size:5px;
+  cursor:pointer;text-align:center;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.tab-btn:last-child{border-right:none;}
+.tab-btn .tn{display:block;font-size:9px;margin-bottom:2px;color:inherit;}
+.tab-btn.active{
+  background:var(--panel);
+  color:var(--gold);
+  border-bottom:2px solid var(--gold);
+}
+
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── COMPLETE BANNER ── */
+.complete-banner{
+  display:none;margin:10px;padding:14px 10px;
+  background:var(--panel2);
+  border:1px solid var(--gold);
+  text-align:center;
+  animation:glow .8s ease-in-out infinite alternate;
+}
+@keyframes glow{from{box-shadow:0 0 8px rgba(200,168,76,0.3);}to{box-shadow:0 0 20px rgba(200,168,76,0.6);}}
+.complete-banner.show{display:block;}
+.cb-ico{font-size:20px;margin-bottom:6px;}
+.cb-txt{font-size:8px;color:var(--gold);margin-bottom:3px;font-family:'Playfair Display',serif;font-style:italic;}
+.cb-sub{font-size:6px;color:var(--dim);}
+
+/* ── SECTION HEADER ── */
+.section-hdr{
+  background:var(--panel2);
+  border-bottom:1px solid var(--border);
+  padding:10px 14px 8px;
+  position:relative;
+  overflow:hidden;
+}
+
+.section-hdr::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+.section-title-lg{
+  font-family:'Playfair Display',serif;
+  font-size:14px;font-style:italic;
+  color:var(--gold);margin-bottom:3px;
+}
+.section-desc{font-size:6px;color:var(--dim);line-height:2;margin-bottom:6px;}
+.section-prog-row{display:flex;align-items:center;gap:6px;}
+.section-prog-row .prog-bar{flex:1;margin-bottom:0;}
+.section-pct{font-size:6px;color:var(--gold);white-space:nowrap;min-width:34px;text-align:right;}
+
+/* BOXES */
+.box-info{
+  margin:6px 12px;padding:8px;
+  background:rgba(32,136,120,0.06);
+  border:1px solid var(--teal);
+  font-size:6px;color:var(--teal);line-height:2;
+}
+.box-warn{
+  margin:6px 12px;padding:8px;
+  background:rgba(139,10,20,0.08);
+  border:1px solid var(--red);
+  font-size:6px;color:#ff8090;line-height:2;
+}
+.box-ttl{display:block;margin-bottom:3px;letter-spacing:1px;font-size:6px;}
+
+/* ── CATEGORY ── */
+.cat{border-bottom:1px solid var(--border);}
+.cat-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;background:var(--panel);
+  cursor:pointer;user-select:none;
+}
+.cat-hdr:active{background:var(--panel2);}
+.cat-lft{display:flex;align-items:center;gap:6px;}
+.cat-ico{font-size:12px;}
+.cat-nm{font-size:6px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;}
+.cat-rgt{display:flex;align-items:center;gap:6px;font-size:6px;color:var(--dim);}
+.cat-arr{color:var(--gold);font-size:7px;transition:transform 0.15s;}
+.cat.open .cat-arr{transform:rotate(90deg);}
+.cat-body{display:none;background:var(--bg);}
+.cat.open .cat-body{display:block;}
+
+/* ── ACHIEVEMENT ITEM ── */
+.achieve{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--panel2);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:var(--bg);
+}
+.achieve:last-child{border-bottom:none;}
+.achieve:active{background:var(--panel);}
+
+.ach-chk{
+  width:14px;height:14px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:10px;margin-top:2px;
+  color:var(--gold);
+}
+.achieve.done .ach-chk{
+  background:var(--gold2);border-color:var(--gold);color:#000;
+}
+
+.ach-info{flex:1;min-width:0;}
+.ach-name{
+  font-family:'Playfair Display',serif;
+  font-size:13px;font-style:italic;
+  color:var(--white);margin-bottom:3px;line-height:1.3;
+}
+.achieve.done .ach-name{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--gold);}
+.ach-req{font-size:6px;color:var(--dim);line-height:2;margin-bottom:4px;}
+.ach-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+.ach-badge{
+  display:inline-block;font-size:5px;padding:2px 5px;
+  border:1px solid;letter-spacing:1px;text-transform:uppercase;
+}
+.d-easy  {color:#60c060; border-color:#304830; background:rgba(96,192,96,0.06);}
+.d-medium{color:var(--gold); border-color:var(--gold2); background:rgba(200,168,76,0.06);}
+.d-hard  {color:#ff9040; border-color:#804010; background:rgba(255,144,64,0.06);}
+.d-insane{color:var(--red2); border-color:var(--red); background:rgba(192,16,32,0.08);}
+
+/* ── SPOILER TOGGLE ── */
+.spoiler-bar{
+  padding:8px 14px;
+  background:var(--panel2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+}
+.spoiler-lbl{font-size:6px;color:var(--red2);letter-spacing:2px;text-transform:uppercase;}
+.spoiler-toggle{font-size:6px;color:var(--gold);letter-spacing:1px;}
+
+/* ── RESET ── */
+.reset-wrap{padding:14px;text-align:center;background:var(--panel);border-top:1px solid var(--border);}
+.px-btn{
+  background:transparent;border:1px solid var(--red);
+  color:var(--red);font-family:'JetBrains Mono',monospace;font-size:6px;
+  padding:8px 14px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;
+}
+.px-btn:active{background:rgba(139,10,20,0.15);}
+
+footer{
+  padding:14px;text-align:center;
+  font-size:5px;color:var(--dim);
+  border-top:1px solid var(--border);
+  letter-spacing:3px;text-transform:uppercase;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="gun-barrel">
+    <div class="bond-number">0 0 7</div>
+    <div class="bond-title">First Light</div>
+    <div class="bond-sub">Achievement Tracker</div>
+    <div class="bond-edition">Steam Edition · IO Interactive · 2026</div>
+  </div>
+</header>
+
+<div class="prog-wrap">
+  <div class="prog-row">
+    <span class="prog-lbl">Mission progress</span>
+    <span class="prog-val" id="gNum">0 / 37</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="gBar" style="width:0%"></div></div>
+  <div class="stat-row">
+    <div class="stat-box"><span class="stat-val" id="sDone">0</span><span class="stat-lbl">Unlocked</span></div>
+    <div class="stat-box"><span class="stat-val" id="sLeft">37</span><span class="stat-lbl">Remaining</span></div>
+    <div class="stat-box"><span class="stat-val" id="sPct">0%</span><span class="stat-lbl">Complete</span></div>
+  </div>
+</div>
+
+<div class="complete-banner" id="completeBanner">
+  <div class="cb-ico">🔫</div>
+  <div class="cb-txt">The name's Bond. James Bond.</div>
+  <div class="cb-sub">37 / 37 ACHIEVEMENTS UNLOCKED</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="0" onclick="showTab('0')"><span class="tn">◆</span>STORY</button>
+  <button class="tab-btn" data-tab="1" onclick="showTab('1')"><span class="tn">◆</span>COMBAT</button>
+  <button class="tab-btn" data-tab="2" onclick="showTab('2')"><span class="tn">◆</span>COLLECT</button>
+  <button class="tab-btn" data-tab="3" onclick="showTab('3')"><span class="tn">◆</span>TACSIM</button>
+  <button class="tab-btn" data-tab="4" onclick="showTab('4')"><span class="tn">◆</span>SPOILER</button>
+  <button class="tab-btn" data-tab="all" onclick="showTab('all')"><span class="tn">◆</span>ALL</button>
+</div>
+
+<div id="tab-0"   class="tab-content active"></div>
+<div id="tab-1"   class="tab-content"></div>
+<div id="tab-2"   class="tab-content"></div>
+<div id="tab-3"   class="tab-content"></div>
+<div id="tab-4"   class="tab-content"></div>
+<div id="tab-all" class="tab-content"></div>
+
+<div class="reset-wrap">
+  <button class="px-btn" onclick="resetAll()">◆ Reset progress ◆</button>
+</div>
+<footer>AGT &nbsp;·&nbsp; 007 First Light Achievement Tracker &nbsp;·&nbsp; Steam Edition</footer>
+</div>
+
+<script>
+const KEY='agt_007_v1';
+const DLBL={easy:'Easy',medium:'Normal',hard:'Hard',insane:'Expert'};
+
+// ── LOGROS COMPLETOS (37 Steam) ───────────────────────────────────────────────
+const SECTIONS=[
+  {
+    id:'story',tab:'0',
+    title:'Story Missions',
+    desc:'Unlocked automatically by completing the main campaign.',
+    info:'No missable achievements. You can replay any chapter via Chapter Select.',
+    warn:null,
+    spoiler:false,
+    cats:[
+      {ico:'🎬',nm:'CAMPAIGN',ts:[
+        {id:'first-purchase',nm:'Shaken not stirred',req:'Complete your first assignment at the nightclub.',dif:'easy',pct:'~80%'},
+        {id:'from-malta',    nm:'From Malta with love',req:'Complete your training as a recruit in Malta.',dif:'easy',pct:'~75%'},
+        {id:'icebreaker',   nm:'Icebreaker',          req:'Survive the helicopter crash.',               dif:'easy',pct:'~70%'},
+        {id:'all-time-high', nm:'All time high',      req:"Infiltrate Nicholas Webb's penthouse.",       dif:'easy',pct:'~60%'},
+        {id:'agent-fire',   nm:'Agent under fire',    req:'Escape in the bin lorry.',                   dif:'easy',pct:'~55%'},
+        {id:'hard-man',     nm:'A hard man to kill',  req:'Survive an assassination attempt.',           dif:'easy',pct:'~50%'},
+        {id:'nobody-lives', nm:'Nobody lives forever',req:"Find 009's body.",                            dif:'easy',pct:'~45%'},
+        {id:'expect-die',   nm:'I expect you to die', req:'Survive the explosion at the hotel in Slovakia.',dif:'easy',pct:'~40%'},
+        {id:'win-lose',     nm:'Win, lose or die',    req:'Win the auction.',                            dif:'easy',pct:'~35%'},
+        {id:'double-die',   nm:'Double or die',       req:'Save Theresa Lorca.',                         dif:'easy',pct:'~30%'},
+        {id:'solo',         nm:'Solo',                req:'Leave MI6 as a rogue agent.',                 dif:'easy',pct:'~25%'},
+      ]},
+    ]
+  },
+  {
+    id:'combat',tab:'1',
+    title:'Combat Techniques',
+    desc:'Skill-based achievements. Replayable via Chapter Select.',
+    info:'Most can be done in Chapter 1 or 2. No difficulty requirement.',
+    warn:null,
+    spoiler:false,
+    cats:[
+      {ico:'🔫',nm:'GADGETS & COMBAT',ts:[
+        {id:'soft-landing',  nm:'Soft landing',       req:'Tackle an enemy over a ledge.',               dif:'easy',  pct:'~55%'},
+        {id:'sleight',       nm:'Sleight of hand',    req:'Disarm an enemy by shooting their weapon.',   dif:'medium',pct:'~40%'},
+        {id:'shocking',      nm:'Positively shocking',req:'Make an enemy taser another enemy.',           dif:'medium',pct:'~35%'},
+        {id:'short-fuse',    nm:'Short fuse',         req:"Shoot at an enemy while he's throwing a grenade.",dif:'medium',pct:'~30%'},
+        {id:'hell-live',     nm:"He'll live",         req:'Knock out an enemy by shooting him in the legs.',dif:'medium',pct:'~40%'},
+        {id:'firestarter',   nm:'Firestarter',        req:'Push an enemy into a fire extinguisher.',     dif:'easy',  pct:'~45%'},
+        {id:'damp-squib',    nm:'Damp squib',         req:'Hack a grenade before it explodes.',          dif:'medium',pct:'~25%'},
+        {id:'disarming',     nm:'Disarming personality',req:'Disarm an enemy with a laser.',             dif:'medium',pct:'~30%'},
+        {id:'exit-plan',     nm:'Always have an exit plan',req:'Use a gadget to escape a confrontation.',dif:'easy',  pct:'~50%'},
+      ]},
+    ]
+  },
+  {
+    id:'collect',tab:'2',
+    title:'Collectibles',
+    desc:'92 collectibles across the campaign. All replayable via Chapter Select.',
+    info:'Tip: use Chapter Select to clean up. There are 4 categories, each with its own achievement plus a combined one.',
+    warn:null,
+    spoiler:false,
+    cats:[
+      {ico:'📬',nm:'COLLECTIBLES',ts:[
+        {id:'world-not-enough',nm:'The world is not enough',req:'Collect all postcards (10 total).',     dif:'medium',pct:'~20%'},
+        {id:'eyes-only',       nm:'For your eyes only',     req:'Unlock all MI6 files.',                 dif:'medium',pct:'~18%'},
+        {id:'recovered',       nm:'Recovered assets',       req:'Collect all mementos.',                 dif:'medium',pct:'~18%'},
+        {id:'casino-royale',   nm:'Casino Royale',          req:'Collect all playing cards.',            dif:'medium',pct:'~18%'},
+        {id:'legacy',          nm:'A Legacy of spycraft',   req:'Discover all legacy items.',            dif:'medium',pct:'~15%'},
+        {id:'collectors',      nm:"A collector's habit",    req:'Find ALL collectables.',                dif:'hard',  pct:'~10%'},
+      ]},
+    ]
+  },
+  {
+    id:'tacsim',tab:'3',
+    title:'Tactical Simulations',
+    desc:'TacSim se desbloquea tras el Capítulo 6. Accessible desde el menú principal.',
+    info:'Puedes hacer los 4 logros en ~1 hora. Empieza por Advanced Tactical Training para subir nivel rápido. Tier 3 es el mas difícil pero no requiere skill extremo.',
+    warn:null,
+    spoiler:false,
+    cats:[
+      {ico:'🖥️',nm:'TACSIM',ts:[
+        {id:'what-if',       nm:'What if…?',          req:'Complete an operation in TacSim.',            dif:'easy',  pct:'~30%'},
+        {id:'change-pace',   nm:'A Change of pace',   req:'Complete an Escalation in TacSim.',          dif:'easy',  pct:'~28%'},
+        {id:'keep-moving',   nm:'Keep moving forward',req:'Achieve clearance level 3 in TacSim.',       dif:'medium',pct:'~20%'},
+        {id:'readiness',     nm:'The readiness is all',req:'Beat tier 3 of an Escalation in TacSim.',   dif:'hard',  pct:'~12%'},
+      ]},
+    ]
+  },
+  {
+    id:'spoiler',tab:'4',
+    title:'Story Spoilers',
+    desc:'⚠ These achievements contain major story spoilers.',
+    info:'All unlocked naturally by completing the campaign. Zero missables.',
+    warn:'SPOILER WARNING — only read if you have finished the game or do not mind story spoilers.',
+    spoiler:true,
+    cats:[
+      {ico:'🔒',nm:'STORY SPOILERS',ts:[
+        {id:'you-live-twice', nm:'You only live twice', req:'Defeat the assassin.',           dif:'easy',pct:'~40%'},
+        {id:'trigger',        nm:'Trigger Mortis',      req:'Escape the ambush alive.',       dif:'easy',pct:'~35%'},
+        {id:'skyfall',        nm:'Skyfall',             req:'Jump out of a plane in Slovakia.',dif:'easy',pct:'~32%'},
+        {id:'you-know-name',  nm:'You know my name',   req:'Defeat Damien Webb.',             dif:'easy',pct:'~28%'},
+        {id:'no-time-die',    nm:'No time to die',     req:'Escape by helicopter.',           dif:'easy',pct:'~25%'},
+        {id:'king-country',   nm:'For king and country',req:'Defend MI6.',                   dif:'medium',pct:'~20%'},
+        {id:'writing-wall',   nm:'The writing is on the wall',req:'Catch Isola.',            dif:'easy',pct:'~22%'},
+      ]},
+    ]
+  },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let ch={};
+function load(){try{const s=localStorage.getItem(KEY);if(s)ch=JSON.parse(s);}catch(e){ch={};}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(ch));}catch(e){}}
+function tog(id){ch[id]=!ch[id];save();render();}
+function resetAll(){ch={};save();render();}
+function allTs(){return SECTIONS.flatMap(s=>s.cats.flatMap(c=>c.ts));}
+function total(){return allTs().length;}
+function dn(){return Object.values(ch).filter(Boolean).length;}
+
+// ── BUILD ─────────────────────────────────────────────────────────────────────
+function bA(t){
+  const ok=!!ch[t.id];
+  return`<div class="achieve${ok?' done':''}" onclick="tog('${t.id}')">
+<div class="ach-chk">${ok?'◆':''}</div>
+<div class="ach-info">
+  <div class="ach-name">${t.nm}</div>
+  <div class="ach-req">${t.req}</div>
+  <div class="ach-meta">
+    <span class="ach-badge d-${t.dif}">${DLBL[t.dif]}</span>
+    <span style="font-size:5px;color:var(--dim)">STEAM: ${t.pct}</span>
+  </div>
+</div>
+</div>`;}
+
+function bCats(cats,si){
+  return cats.map((c,ci)=>{
+    const id=`c${si}_${ci}`,cd=c.ts.filter(t=>ch[t.id]).length;
+    return`<div class="cat open" id="${id}">
+<div class="cat-hdr" onclick="tc('${id}')">
+  <div class="cat-lft"><span class="cat-ico">${c.ico}</span><span class="cat-nm">${c.nm}</span></div>
+  <div class="cat-rgt"><span>${cd}/${c.ts.length}</span><span class="cat-arr">▶</span></div>
+</div>
+<div class="cat-body">${c.ts.map(t=>bA(t)).join('')}</div>
+</div>`;}).join('');}
+
+function bSection(sec){
+  const all=sec.cats.flatMap(c=>c.ts);
+  const d=all.filter(t=>ch[t.id]).length;
+  const pct=all.length?Math.round(d/all.length*100):0;
+  let h=`<div class="section-hdr">
+<div class="section-title-lg">${sec.title}</div>
+<div class="section-desc">${sec.desc}</div>
+<div class="section-prog-row">
+  <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+  <div class="section-pct">${d}/${all.length}</div>
+</div>
+</div>`;
+  if(sec.info) h+=`<div class="box-info"><span class="box-ttl">◆ GUIDE</span>${sec.info}</div>`;
+  if(sec.warn) h+=`<div class="box-warn"><span class="box-ttl">◆ WARNING</span>${sec.warn}</div>`;
+  h+=bCats(sec.cats,sec.id);
+  return h;
+}
+
+function bAll(){
+  let h='';
+  SECTIONS.forEach(sec=>{
+    h+=`<div class="cat-hdr" style="background:var(--panel2)"><div class="cat-lft"><span class="cat-nm" style="color:var(--gold)">${sec.title.toUpperCase()}</span></div></div>`;
+    sec.cats.forEach(c=>c.ts.forEach(t=>{h+=bA(t);}));
+  });
+  return h;
+}
+
+function render(){
+  const d=dn(),tot=total(),pct=tot?Math.round(d/tot*100):0;
+  document.getElementById('gNum').textContent=`${d} / ${tot}`;
+  document.getElementById('gBar').style.width=pct+'%';
+  document.getElementById('sDone').textContent=d;
+  document.getElementById('sLeft').textContent=tot-d;
+  document.getElementById('sPct').textContent=pct+'%';
+  document.getElementById('completeBanner').classList.toggle('show',d>=tot);
+  SECTIONS.forEach(sec=>{
+    document.getElementById('tab-'+sec.tab).innerHTML=bSection(sec);
+  });
+  document.getElementById('tab-all').innerHTML=bAll();
+}
+
+function tc(id){document.getElementById(id).classList.toggle('open');}
+function showTab(t){
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelector(`[data-tab="${t}"]`).classList.add('active');
+}
+
+load();render();
+</script>
+</body>
+</html>
