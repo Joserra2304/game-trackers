@@ -51,7 +51,6 @@ body::before {
 
 .app { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
 
-/* ── HEADER ── */
 header {
   padding: 32px 20px 20px;
   text-align: center;
@@ -59,268 +58,98 @@ header {
   background: linear-gradient(180deg, rgba(139,26,42,0.18) 0%, transparent 100%);
 }
 
-.header-icon {
-  width: 72px; height: 72px;
-  margin: 0 auto 14px;
-  display: block;
-  /* Si no hay imagen, muestra el fallback */
-}
-.header-icon img {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(201,168,76,0.4));
-}
-.header-icon .fallback {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 44px;
-  filter: drop-shadow(0 0 10px rgba(201,168,76,0.3));
-}
+.header-icon { width: 72px; height: 72px; margin: 0 auto 14px; display: block; }
+.header-icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 12px rgba(201,168,76,0.4)); }
+.header-icon .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 44px; }
 
 .site-title {
   font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 32px;
-  color: var(--gold);
+  font-size: 32px; color: var(--gold);
   text-shadow: 0 0 24px rgba(201,168,76,0.35);
-  letter-spacing: 1px;
-  margin-bottom: 4px;
+  letter-spacing: 1px; margin-bottom: 4px;
 }
 
 .site-sub {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  font-size: 10px; color: var(--text-dim);
+  letter-spacing: 3px; text-transform: uppercase;
 }
 
-/* ── GLOBAL ── */
 .global {
   padding: 16px 20px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
 
-.g-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
+.g-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.g-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+.g-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: var(--gold); }
+.g-bar { height: 5px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 14px; }
+.g-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 0.5s ease; }
 
-.g-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
+.g-pills { display: flex; gap: 8px; }
+.pill { flex: 1; padding: 10px 6px; background: var(--surface2); border: 1px solid var(--border); text-align: center; }
+.pill-val { display: block; font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.pill-lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
 
-.g-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--gold);
-}
+.section-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; padding: 16px 20px 8px; }
 
-.g-bar {
-  height: 5px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 14px;
-}
-
-.g-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-  border-radius: 2px;
-  transition: width 0.5s ease;
-}
-
-.g-pills {
-  display: flex;
-  gap: 8px;
-}
-
-.pill {
-  flex: 1;
-  padding: 10px 6px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  text-align: center;
-}
-
-.pill-val {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 3px;
-}
-
-.pill-lbl {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* ── SECTION TITLE ── */
-.section-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 16px 20px 8px;
-}
-
-/* ── GAME CARD ── */
 .game-card {
   margin: 0 16px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  display: block;
-  text-decoration: none;
-  color: inherit;
+  display: block; text-decoration: none; color: inherit;
   -webkit-tap-highlight-color: transparent;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.15s;
+  position: relative; overflow: hidden;
 }
 
 .game-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
 }
 
 .game-card:active { background: var(--surface2); }
 .game-card.disabled { opacity: 0.35; pointer-events: none; }
 
-/* Línea de color izquierda */
-.card-accent {
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px;
-}
+.card-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
 
-.card-body {
-  padding: 14px 14px 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.card-body { padding: 14px 14px 14px 18px; display: flex; align-items: center; gap: 14px; }
 
 .game-icon {
-  width: 52px; height: 52px;
-  flex-shrink: 0;
+  width: 52px; height: 52px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  overflow: hidden;
+  background: var(--surface2); border: 1px solid var(--border); overflow: hidden;
 }
-
-.game-icon img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  image-rendering: pixelated;
-}
-
+.game-icon img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
 .game-icon .ico-fallback { font-size: 28px; }
 
 .game-meta { flex: 1; min-width: 0; }
+.game-name { font-family: 'UnifrakturMaguntia', cursive; font-size: 20px; margin-bottom: 2px; line-height: 1.2; }
+.game-studio { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.game-bar { height: 3px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 6px; }
+.game-bar-fill { height: 100%; border-radius: 1px; transition: width 0.4s ease; }
+.game-footer { display: flex; justify-content: space-between; align-items: center; }
+.game-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); }
+.game-pct { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; flex-shrink: 0; margin-left: 10px; }
 
-.game-name {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-size: 20px;
-  margin-bottom: 2px;
-  line-height: 1.2;
-}
-
-.game-studio {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.game-bar {
-  height: 3px;
-  background: var(--border);
-  border-radius: 1px;
-  overflow: hidden;
-  margin-bottom: 6px;
-}
-
-.game-bar-fill {
-  height: 100%;
-  border-radius: 1px;
-  transition: width 0.4s ease;
-}
-
-.game-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.game-count {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-}
-
-.game-pct {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-left: 10px;
-}
-
-.status-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  padding: 3px 7px;
-  border: 1px solid;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.s-plat   { color: var(--gold);   border-color: var(--gold-dim);  background: rgba(201,168,76,0.08); }
-.s-prog   { color: var(--green);  border-color: rgba(76,175,114,0.4); background: rgba(76,175,114,0.05); }
-.s-new    { color: var(--red3);   border-color: var(--red);       background: rgba(139,26,42,0.08); }
-.s-soon   { color: var(--text-dim); border-color: var(--border); }
+.status-tag { font-family: 'JetBrains Mono', monospace; font-size: 8px; padding: 3px 7px; border: 1px solid; letter-spacing: 1px; text-transform: uppercase; }
+.s-plat { color: var(--gold);     border-color: var(--gold-dim);        background: rgba(201,168,76,0.08); }
+.s-prog { color: var(--green);    border-color: rgba(76,175,114,0.4);   background: rgba(76,175,114,0.05); }
+.s-new  { color: var(--red3);     border-color: var(--red);             background: rgba(139,26,42,0.08); }
+.s-soon { color: var(--text-dim); border-color: var(--border); }
 
 .coming-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text-dim);
-  text-align: center;
-  padding: 5px;
-  border-top: 1px solid var(--border);
-  background: var(--surface2);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim);
+  text-align: center; padding: 5px; border-top: 1px solid var(--border);
+  background: var(--surface2); letter-spacing: 2px; text-transform: uppercase;
 }
 
-/* ── FOOTER ── */
 .spacer { flex: 1; }
 
 footer {
-  padding: 20px;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  border-top: 1px solid var(--border);
+  padding: 20px; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  color: var(--text-dim); letter-spacing: 1px; border-top: 1px solid var(--border);
 }
 </style>
 </head>
@@ -340,9 +169,7 @@ footer {
       <span class="g-label">Progreso total</span>
       <span class="g-num" id="gNum">0 / 0</span>
     </div>
-    <div class="g-bar">
-      <div class="g-fill" id="gBar" style="width:0%"></div>
-    </div>
+    <div class="g-bar"><div class="g-fill" id="gBar" style="width:0%"></div></div>
     <div class="g-pills">
       <div class="pill"><span class="pill-val" id="mJuegos">0</span><span class="pill-lbl">Juegos</span></div>
       <div class="pill"><span class="pill-val" id="mComp">0</span><span class="pill-lbl">Platinos</span></div>
@@ -376,28 +203,27 @@ footer {
   </a>
 
   <!-- SHOVEL KNIGHT -->
-  <div class="game-card disabled">
-    <div class="card-accent" style="background:#45b7d1"></div>
+  <a class="game-card" href="shovel-knight/index.html">
+    <div class="card-accent" style="background:#2870c8"></div>
     <div class="card-body">
       <div class="game-icon">
-<img src="shovel-sprite.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <span class="ico-fallback">⚔️</span>
+        <img src="shovel-sprite.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="ico-fallback" style="display:none">⚔️</span>
       </div>
       <div class="game-meta">
-        <div class="game-name" style="color:#45b7d1">Shovel Knight</div>
+        <div class="game-name" style="color:#4898e8">Shovel Knight</div>
         <div class="game-studio">Yacht Club Games · Treasure Trove</div>
         <div class="game-bar">
-          <div class="game-bar-fill" style="width:0%;background:#45b7d1"></div>
+          <div class="game-bar-fill" id="bar-sk" style="width:0%;background:linear-gradient(90deg,#1a4a98,#4898e8)"></div>
         </div>
         <div class="game-footer">
-          <span class="game-count">0 / 138 logros</span>
-          <span class="status-tag s-soon">Próximamente</span>
+          <span class="game-count" id="count-sk">0 / 138 logros</span>
+          <span class="status-tag s-prog" id="badge-sk">Sin empezar</span>
         </div>
       </div>
-      <div class="game-pct" style="color:rgba(160,140,200,0.3)">--</div>
+      <div class="game-pct" id="pct-sk" style="color:#4898e8">0%</div>
     </div>
-    <div class="coming-label">⚙ Tracker en construcción</div>
-  </div>
+  </a>
 
   <div class="spacer"></div>
   <footer>Joserra · Game Trackers · 2026</footer>
@@ -407,6 +233,7 @@ footer {
 <script>
 const GAMES = [
   { id: 'mina', key: 'mina_platinum_v1', total: 50 },
+  { id: 'sk',   key: 'sk_platinum_v1',   total: 138 },
 ];
 
 function getProgress(key) {
@@ -431,9 +258,9 @@ function render() {
     const ec  = document.getElementById('count-' + g.id);
     const ebg = document.getElementById('badge-' + g.id);
 
-    if (ep)  ep.textContent  = pct + '%';
-    if (eb)  eb.style.width  = pct + '%';
-    if (ec)  ec.textContent  = d + ' / ' + g.total + ' logros';
+    if (ep)  ep.textContent = pct + '%';
+    if (eb)  eb.style.width = pct + '%';
+    if (ec)  ec.textContent = d + ' / ' + g.total + ' logros';
     if (ebg) {
       if (d >= g.total) {
         ebg.textContent = '🏆 Platino';
@@ -451,7 +278,7 @@ function render() {
   const gp = gTotal ? Math.round(gDone / gTotal * 100) : 0;
   document.getElementById('gNum').textContent    = gDone + ' / ' + gTotal;
   document.getElementById('gBar').style.width    = gp + '%';
-  document.getElementById('mJuegos').textContent = GAMES.length + 1;
+  document.getElementById('mJuegos').textContent = GAMES.length;
   document.getElementById('mComp').textContent   = gComp;
   document.getElementById('mPct').textContent    = gp + '%';
 }
