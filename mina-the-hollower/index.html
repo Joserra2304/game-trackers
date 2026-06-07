@@ -3,227 +3,330 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MINA — ACHIEVEMENT TRACKER</title>
+<link rel="manifest" href="/game-trackers/manifest.json">
+<meta name="theme-color" content="#1a0a2e">
+<title>MINA THE HOLLOWER — ACHIEVEMENT TRACKER</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* Paleta GBC verde — misma estructura que versión morada */
+/* ── PALETA GBC MORADO/AMARILLO ── */
 :root{
-  --s0:#0a1a0a; --s1:#0f380f; --s2:#1a4a1a; --s3:#306230; --s4:#5a8a2a;
-  --green1:#4a7a20; --green2:#8bac0f; --green3:#9bbc0f; --green4:#c4d4a8;
-  --dim:#2a4a1a;
-  /* Carcasa GBC — color negro/antracita como la GBC negra */
-  --shell:#2a2a35; --shell-d:#1a1a22; --shell-l:#3a3a48;
-  --shell-btn:#c83080; --shell-b:#2060c0;
+  /* Pantalla */
+  --s0:#0d0818;   /* negro pantalla */
+  --s1:#1a0a2e;   /* fondo oscuro */
+  --s2:#2d1254;   /* panel */
+  --s3:#4a2080;   /* borde */
+  --s4:#7a40b0;   /* acento */
+  /* Colores */
+  --gold:#f5c842;
+  --gold2:#c89010;
+  --gold3:#8a5c00;
+  --purple:#c080ff;
+  --purple2:#8040c0;
+  --purple3:#4a1890;
+  --white:#f8f0ff;
+  --dim:#9070c0;
+  /* Carcasa */
+  --shell:#2e1a50;
+  --shell-d:#1a0a30;
+  --shell-l:#4a2880;
+  --shell-a:#f5c842;   /* botón A amarillo */
+  --shell-b:#c080ff;   /* botón B morado */
 }
 
 *{box-sizing:border-box;margin:0;padding:0;}
-html{
-  background:#1a2a1a;
-  min-height:100vh;
-}
+html{background:#0a0418;min-height:100vh;}
 
 .gbc-wrap{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  /* Marco GBC en los bordes del móvil */
+  width:100%;display:flex;flex-direction:column;min-height:100vh;
   border-left:6px solid var(--shell-d);
   border-right:6px solid var(--shell-d);
   box-shadow:
     inset 2px 0 0 var(--shell-l),
     inset -2px 0 0 var(--shell-l),
-    -4px 0 12px rgba(0,0,0,0.5),
-    4px 0 12px rgba(0,0,0,0.5);
+    -6px 0 20px rgba(120,40,200,0.3),
+    6px 0 20px rgba(120,40,200,0.3);
 }
 
-/* PANTALLA borde a borde */
+/* PANTALLA */
 .screen{
-  flex:1;
-  background:var(--s0);
-  position:relative;
-  overflow:hidden;
+  flex:1;background:var(--s0);position:relative;overflow:hidden;
   border-top:8px solid var(--shell-d);
-  border-bottom:none;
-  box-shadow:inset 0 4px 8px rgba(0,0,0,0.6);
+  box-shadow:inset 0 4px 12px rgba(0,0,0,0.8);
 }
 
-/* Scanlines verdes */
+/* Scanlines moradas */
 .screen::after{
-  content:'';position:fixed;inset:0;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
   background:repeating-linear-gradient(180deg,
     transparent 0,transparent 3px,
-    rgba(15,56,15,0.18) 3px,rgba(15,56,15,0.18) 4px);
-  pointer-events:none;z-index:9999;
+    rgba(80,20,140,0.12) 3px,rgba(80,20,140,0.12) 4px);
 }
 
-/* Viñeta LCD */
+/* Viñeta */
 .screen::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at center,transparent 55%,rgba(10,26,10,0.4) 100%);
-  pointer-events:none;z-index:9998;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(10,4,24,0.5) 100%);
 }
 
 .blink{animation:bl .8s steps(1) infinite;}
 @keyframes bl{50%{opacity:0;}}
 
 /* HEADER */
-.s-header{background:var(--s1);border-bottom:3px solid var(--s3);padding:10px 8px 8px;text-align:center;}
-.game-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--green3);text-shadow:2px 2px 0 var(--s1),3px 3px 0 #000;letter-spacing:1px;margin-bottom:4px;}
-.tracker-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green2);letter-spacing:2px;margin-bottom:2px;}
+.s-header{
+  background:var(--s1);border-bottom:3px solid var(--gold2);
+  padding:10px 8px 8px;text-align:center;
+}
+.game-title{
+  font-family:'Press Start 2P',monospace;font-size:10px;
+  color:var(--gold);text-shadow:2px 2px 0 var(--gold3),3px 3px 0 #000;
+  letter-spacing:1px;margin-bottom:4px;
+}
+.tracker-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--purple);letter-spacing:2px;margin-bottom:2px;}
 .tracker-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:2px;}
 
-/* HUD corazones */
-.s-hud{background:#000;padding:5px 8px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--s3);}
-.hud-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--green2);}
-.hearts{display:flex;gap:2px;flex:1;}
-.heart{
-  width:9px;height:9px;background:var(--green2);
-  clip-path:polygon(50% 15%,61% 0,80% 0,100% 20%,100% 50%,50% 100%,0 50%,0 20%,20% 0,39% 0);
+/* HUD */
+.s-hud{
+  background:#000;padding:5px 8px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:2px solid var(--s3);
 }
-.heart.off{background:var(--s2);}
-.hud-right{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);white-space:nowrap;}
+.hud-icon{font-size:10px;color:var(--gold);}
+.hp-bar{flex:1;height:8px;background:#1a0808;border:2px solid #604000;overflow:hidden;}
+.hp-fill{
+  height:100%;
+  background:linear-gradient(180deg,#ffdd60 0%,#f5c842 50%,#a07000 100%);
+  transition:width .3s steps(20);
+}
+.hud-right{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);white-space:nowrap;}
 
 /* TABS */
 .s-tabs{display:flex;background:#000;border-bottom:3px solid var(--s3);}
-.tab-btn{flex:1;padding:6px 1px;border:none;border-right:2px solid var(--s2);background:#000;color:var(--dim);font-family:'Press Start 2P',monospace;font-size:5px;cursor:pointer;text-align:center;}
+.tab-btn{
+  flex:1;padding:6px 1px;border:none;border-right:2px solid var(--s2);
+  background:#000;color:var(--dim);
+  font-family:'Press Start 2P',monospace;font-size:5px;cursor:pointer;text-align:center;
+}
 .tab-btn:last-child{border-right:none;}
 .tab-btn .tn{display:block;font-size:9px;margin-bottom:2px;color:inherit;}
-.tab-btn.active{background:var(--s2);color:var(--green3);border-bottom:3px solid var(--green2);}
+.tab-btn.active{background:var(--s2);color:var(--gold);border-bottom:3px solid var(--gold2);}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
 /* PROGRESS */
 .s-prog{background:var(--s2);border-bottom:2px solid var(--s3);padding:5px 8px;}
-.prog-lbl{display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);margin-bottom:3px;}
-.prog-lbl span{color:var(--green3);}
-.bar-out{height:10px;background:#000;border:2px solid var(--s3);overflow:hidden;box-shadow:inset 0 0 0 1px var(--green1);}
-.bar-in{height:100%;background:repeating-linear-gradient(90deg,var(--green3) 0,var(--green3) 6px,var(--green2) 6px,var(--green2) 8px);transition:width .3s steps(16);}
+.prog-lbl{display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--purple2);margin-bottom:3px;}
+.prog-lbl span{color:var(--gold);}
+.bar-out{height:10px;background:#000;border:2px solid var(--s3);overflow:hidden;box-shadow:inset 0 0 0 1px var(--dim);}
+.bar-in{
+  height:100%;
+  background:repeating-linear-gradient(90deg,var(--gold2) 0,var(--gold2) 5px,var(--gold) 5px,var(--gold) 7px);
+  transition:width .3s steps(16);
+}
 
 /* PLAT */
-.s-plat{display:none;margin:6px;padding:10px 6px;background:var(--s1);border:3px solid var(--green3);text-align:center;animation:bord .8s steps(1) infinite;}
-@keyframes bord{50%{border-color:var(--s2);}}
+.s-plat{
+  display:none;margin:6px;padding:10px 6px;
+  background:var(--s2);border:3px solid var(--gold);
+  text-align:center;animation:bord .8s steps(1) infinite;
+}
+@keyframes bord{50%{border-color:var(--purple);}}
 .s-plat.show{display:block;}
-.plat-ico{font-size:18px;margin-bottom:4px;filter:grayscale(1) brightness(2);}
-.plat-txt{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);margin-bottom:3px;}
-.plat-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);}
+.plat-ico{font-size:18px;margin-bottom:4px;}
+.plat-txt{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);margin-bottom:3px;}
+.plat-sub{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--purple);}
 
 /* PARTIDA HDR */
 .p-hdr{background:var(--s2);border-bottom:2px solid var(--s3);padding:8px;}
-.p-name{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green3);margin-bottom:3px;}
-.p-desc{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);line-height:2;margin-bottom:6px;}
+.p-name{font-family:'Press Start 2P',monospace;font-size:8px;margin-bottom:3px;}
+.p-desc{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);line-height:2;margin-bottom:6px;}
 .p-row{display:flex;align-items:center;gap:6px;}
 .p-row .bar-out{flex:1;height:8px;}
-.p-pct{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green3);white-space:nowrap;min-width:36px;text-align:right;}
+.p-pct{font-family:'Press Start 2P',monospace;font-size:6px;white-space:nowrap;min-width:36px;text-align:right;}
 
-/* CRON — LCD verde auténtico */
-.cron{margin:8px;background:#000;border:3px solid var(--green2);box-shadow:3px 3px 0 #000;padding:8px;}
-.cron-ttl{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);letter-spacing:1px;margin-bottom:6px;text-align:center;}
-.cron-lcd{background:#050f05;border:2px solid var(--s2);padding:7px 4px;text-align:center;font-family:'Press Start 2P',monospace;font-size:20px;color:var(--green3);letter-spacing:6px;text-shadow:0 0 8px var(--green3),0 0 2px #fff;margin-bottom:6px;box-shadow:inset 0 0 20px rgba(15,56,15,0.9);}
-.cron-lcd.warn{color:var(--green2);text-shadow:0 0 8px var(--green2);animation:bl .5s steps(1) infinite;}
-.cron-lcd.crit{color:var(--s3);text-shadow:0 0 8px var(--s3);animation:bl .3s steps(1) infinite;}
+/* CRON */
+.cron{margin:8px;background:#000;border:3px solid var(--gold2);box-shadow:3px 3px 0 #000;padding:8px;}
+.cron-ttl{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--gold2);letter-spacing:1px;margin-bottom:6px;text-align:center;}
+.cron-lcd{
+  background:#0d0800;border:2px solid #402000;
+  padding:7px 4px;text-align:center;
+  font-family:'Press Start 2P',monospace;font-size:20px;
+  color:var(--gold);letter-spacing:6px;
+  text-shadow:0 0 8px var(--gold),0 0 2px #fff;
+  margin-bottom:6px;
+  box-shadow:inset 0 0 20px rgba(80,40,0,0.9);
+}
+.cron-lcd.warn{color:var(--purple);text-shadow:0 0 8px var(--purple);animation:bl .5s steps(1) infinite;}
+.cron-lcd.crit{color:#ff4040;text-shadow:0 0 8px #ff4040;animation:bl .3s steps(1) infinite;}
 .cron-btns{display:flex;gap:4px;}
-.cron-btn{flex:1;padding:6px 2px;background:var(--s1);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;color:var(--green4);font-family:'Press Start 2P',monospace;font-size:6px;cursor:pointer;text-align:center;}
+.cron-btn{
+  flex:1;padding:6px 2px;background:var(--s1);
+  border:2px solid var(--s3);box-shadow:2px 2px 0 #000;
+  color:var(--white);font-family:'Press Start 2P',monospace;font-size:6px;
+  cursor:pointer;text-align:center;
+}
 .cron-btn:active{transform:translate(2px,2px);box-shadow:none;}
-.cron-btn.start{border-color:var(--green2);color:var(--green3);}
-.cron-btn.pause{border-color:var(--green1);color:var(--green2);}
-.cron-btn.reset{border-color:var(--s3);color:var(--green4);}
+.cron-btn.start{border-color:var(--gold2);color:var(--gold);}
+.cron-btn.pause{border-color:var(--purple2);color:var(--purple);}
+.cron-btn.reset{border-color:#600;color:#f08080;}
 .cron-sv{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);text-align:center;margin-top:4px;}
 
 /* BOXES */
-.box-info{margin:5px 8px;padding:6px;background:rgba(139,172,15,0.05);border:2px solid var(--green2);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);line-height:2;}
-.box-warn{margin:5px 8px;padding:6px;background:rgba(48,98,48,0.1);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green3);line-height:2;}
+.box-info{
+  margin:5px 8px;padding:6px;
+  background:rgba(200,144,16,0.05);border:2px solid var(--gold2);
+  box-shadow:2px 2px 0 #000;
+  font-family:'Press Start 2P',monospace;font-size:6px;color:var(--gold);line-height:2;
+}
+.box-warn{
+  margin:5px 8px;padding:6px;
+  background:rgba(120,40,200,0.08);border:2px solid var(--purple2);
+  box-shadow:2px 2px 0 #000;
+  font-family:'Press Start 2P',monospace;font-size:6px;color:var(--purple);line-height:2;
+}
 .box-ttl{display:block;margin-bottom:3px;letter-spacing:1px;}
 
-/* TRINKETS BOX */
-.box-trinkets{margin:5px 8px;padding:8px;background:rgba(155,188,15,0.06);border:2px solid var(--green3);box-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green4);line-height:2.2;}
-.box-trinkets .box-ttl{color:var(--green3);}
-.trinket-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;}
-.trinket-star{color:var(--green3);flex-shrink:0;}
-.trinket-name{color:var(--green3);}
-.trinket-why{color:var(--green2);font-size:5px;}
+/* TRINKETS + MODS BOX — al final de P2 */
+.box-setup{
+  margin:5px 8px 8px;padding:8px;
+  background:rgba(245,200,66,0.04);
+  border:2px solid var(--gold3);
+  box-shadow:2px 2px 0 #000;
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:var(--white);line-height:2.2;
+}
+.setup-section{margin-bottom:8px;}
+.setup-section:last-child{margin-bottom:0;}
+.setup-ttl{
+  display:block;margin-bottom:5px;
+  font-size:6px;letter-spacing:1px;
+  padding-bottom:3px;
+  border-bottom:2px solid var(--s3);
+}
+.setup-ttl.gold{color:var(--gold);}
+.setup-ttl.purple{color:var(--purple);}
+
+.setup-row{display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;}
+.setup-bullet{flex-shrink:0;color:var(--gold2);}
+.setup-bullet.p{color:var(--purple2);}
+.setup-name{color:var(--white);font-size:6px;}
+.setup-why{color:var(--dim);font-size:5px;display:block;margin-top:1px;}
 
 /* CATEGORY */
 .cat{border-bottom:2px solid var(--s3);}
-.cat-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--s1);cursor:pointer;user-select:none;border-bottom:2px solid var(--s3);}
+.cat-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 8px;background:var(--s1);
+  cursor:pointer;user-select:none;border-bottom:2px solid var(--s3);
+}
 .cat-hdr:active{background:var(--s2);}
 .cat-lft{display:flex;align-items:center;gap:5px;}
 .cat-ico{font-size:11px;}
-.cat-nm{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green2);letter-spacing:1px;}
-.cat-rgt{display:flex;align-items:center;gap:5px;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);}
-.cat-arr{color:var(--green2);font-size:7px;transition:transform .1s steps(3);}
+.cat-nm{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--purple);letter-spacing:1px;}
+.cat-rgt{display:flex;align-items:center;gap:5px;font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);}
+.cat-arr{color:var(--gold2);font-size:7px;transition:transform .1s steps(3);}
 .cat.open .cat-arr{transform:rotate(90deg);}
-.cat-body{display:none;background:#000;}
+.cat-body{display:none;background:#160c28;}
 .cat.open .cat-body{display:block;}
 
 /* TROPHY */
-.trophy{display:flex;align-items:flex-start;gap:8px;padding:8px;border-bottom:2px solid var(--s2);cursor:pointer;-webkit-tap-highlight-color:transparent;background:#000;}
+.trophy{
+  display:flex;align-items:flex-start;gap:8px;padding:8px;
+  border-bottom:2px solid var(--s2);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:#160c28;
+}
 .trophy:last-child{border-bottom:none;}
-.trophy:active{background:var(--s1);}
-.px-chk{width:12px;height:12px;background:var(--s2);border:2px solid var(--s3);box-shadow:2px 2px 0 #000;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;margin-top:2px;color:var(--green3);}
-.trophy.done .px-chk{background:var(--green2);border-color:var(--green3);color:#000;}
+.trophy:active{background:var(--s2);}
+.px-chk{
+  width:12px;height:12px;background:var(--s2);border:2px solid var(--s3);
+  box-shadow:2px 2px 0 #000;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:9px;margin-top:2px;color:var(--gold);
+}
+.trophy.done .px-chk{background:var(--gold2);border-color:var(--gold);color:#000;}
 .t-info{flex:1;min-width:0;}
-.t-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--green4);margin-bottom:3px;line-height:1.8;}
-.trophy.done .t-name{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--green2);}
-.t-req{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--green1);line-height:2;margin-bottom:4px;}
+.t-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--white);margin-bottom:3px;line-height:1.8;}
+.trophy.done .t-name{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--gold2);}
+.t-req{font-family:'Press Start 2P',monospace;font-size:6px;color:#b090e0;line-height:2;margin-bottom:4px;}
 .t-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.t-badge{display:inline-block;font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 4px;border:2px solid;box-shadow:2px 2px 0 #000;letter-spacing:1px;}
-.d-easy  {color:var(--green4);border-color:var(--green2);background:rgba(155,188,15,0.1);}
-.d-medium{color:var(--green3);border-color:var(--green1);background:rgba(139,172,15,0.1);}
-.d-hard  {color:var(--green2);border-color:var(--s3);background:rgba(48,98,48,0.2);}
-.d-insane{color:var(--green4);border-color:var(--s1);background:var(--s2);}
+.t-badge{
+  display:inline-block;font-family:'Press Start 2P',monospace;font-size:5px;
+  padding:2px 4px;border:2px solid;box-shadow:2px 2px 0 #000;letter-spacing:1px;
+}
+.d-easy  {color:var(--gold);  border-color:var(--gold2); background:rgba(245,200,66,0.08);}
+.d-medium{color:var(--purple);border-color:var(--purple2);background:rgba(192,128,255,0.08);}
+.d-hard  {color:#f08080;      border-color:#800;          background:rgba(200,40,40,0.1);}
+.d-insane{color:var(--white); border-color:var(--dim);    background:var(--s2);}
 .t-pct{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);}
 
 /* ALL */
-.all-ttl{padding:5px 8px;font-family:'Press Start 2P',monospace;font-size:6px;letter-spacing:1px;background:var(--s2);color:var(--green2);border-bottom:2px solid var(--s3);border-top:2px solid var(--s3);}
+.all-ttl{
+  padding:5px 8px;font-family:'Press Start 2P',monospace;font-size:6px;
+  letter-spacing:1px;background:var(--s2);color:var(--purple);
+  border-bottom:2px solid var(--s3);border-top:2px solid var(--s3);
+}
 
 /* RESET */
 .reset-wrap{padding:10px 8px;text-align:center;background:var(--s1);border-top:2px solid var(--s3);}
-.px-btn{background:#000;border:2px solid var(--s3);box-shadow:3px 3px 0 #000;color:var(--green2);font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;cursor:pointer;letter-spacing:1px;}
+.px-btn{
+  background:#000;border:2px solid var(--purple2);box-shadow:3px 3px 0 #000;
+  color:var(--purple);font-family:'Press Start 2P',monospace;font-size:6px;
+  padding:7px 10px;cursor:pointer;letter-spacing:1px;
+}
 .px-btn:active{transform:translate(3px,3px);box-shadow:none;}
-.s-footer{padding:5px 8px;text-align:center;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);border-top:2px solid var(--s3);background:var(--s1);}
+.s-footer{
+  padding:5px 8px;text-align:center;font-family:'Press Start 2P',monospace;
+  font-size:5px;color:var(--dim);
+  border-top:2px solid var(--s3);background:var(--s1);
+}
 
-/* BARRA BOTONES — carcasa negra GBC */
+/* BARRA BOTONES */
 .controls-bar{
-  background:var(--shell);
-  border-top:4px solid var(--shell-d);
+  background:var(--shell);border-top:4px solid var(--shell-d);
   padding:10px 16px 14px;
   display:flex;justify-content:space-between;align-items:center;
   box-shadow:inset 0 2px 0 var(--shell-l),inset 0 -3px 0 var(--shell-d);
 }
-
 .dpad{width:48px;height:48px;position:relative;flex-shrink:0;}
-.dpad-h,.dpad-v{position:absolute;background:var(--shell-d);border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 2px 0 rgba(0,0,0,0.5);}
+.dpad-h,.dpad-v{position:absolute;background:var(--shell-d);border-radius:2px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 2px 0 rgba(0,0,0,0.5);}
 .dpad-h{width:100%;height:34%;top:33%;left:0;}
 .dpad-v{width:34%;height:100%;top:0;left:33%;}
 .dpad-ctr{position:absolute;width:34%;height:34%;top:33%;left:33%;background:var(--shell-d);}
-
 .mid-btns{display:flex;flex-direction:column;align-items:center;gap:10px;}
 .mini-row{display:flex;gap:14px;}
 .mini-btn{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.mini-oval{background:var(--shell-d);width:24px;height:7px;border-radius:4px;box-shadow:0 2px 0 rgba(0,0,0,0.4);transform:rotate(-15deg);}
+.mini-oval{
+  background:var(--shell-d);width:24px;height:7px;border-radius:4px;
+  box-shadow:0 2px 0 rgba(0,0,0,0.4);transform:rotate(-15deg);
+}
 .mini-lbl{font-family:'Press Start 2P',monospace;font-size:4px;color:rgba(255,255,255,0.2);letter-spacing:1px;}
-
 .ab-wrap{display:flex;gap:10px;align-items:center;flex-shrink:0;}
-.btn-b,.btn-a{border-radius:50%;box-shadow:0 3px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15);font-family:'Press Start 2P',monospace;font-size:6px;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;cursor:default;}
-.btn-b{width:28px;height:28px;background:var(--shell-btn);margin-top:12px;}
-.btn-a{width:32px;height:32px;background:var(--shell-btn);}
+.btn-b,.btn-a{
+  border-radius:50%;
+  box-shadow:0 3px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15);
+  font-family:'Press Start 2P',monospace;font-size:6px;
+  color:rgba(0,0,0,0.7);
+  display:flex;align-items:center;justify-content:center;cursor:default;
+}
+.btn-b{width:28px;height:28px;background:var(--shell-b);margin-top:12px;color:rgba(255,255,255,0.6);}
+.btn-a{width:32px;height:32px;background:var(--shell-a);}
 
-/* LED verde activo */
+/* LED */
 .led{
   position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  width:6px;height:6px;background:var(--green3);border-radius:50%;
-  box-shadow:0 0 6px var(--green3),0 0 12px rgba(155,188,15,0.5);
-  animation:led-pulse 2s ease-in-out infinite;
+  width:6px;height:6px;background:var(--gold);border-radius:50%;
+  box-shadow:0 0 6px var(--gold),0 0 12px rgba(245,200,66,0.6);
+  animation:led-p 2s ease-in-out infinite;
 }
-@keyframes led-pulse{0%,100%{opacity:1;} 50%{opacity:0.6;}}
+@keyframes led-p{0%,100%{opacity:1;}50%{opacity:0.5;}}
 </style>
 </head>
 <body>
 <div class="gbc-wrap">
-
   <div class="screen">
+
     <div class="s-header">
       <div class="game-title">MINA THE HOLLOWER</div>
       <div class="tracker-lbl">ACHIEVEMENT TRACKER</div>
@@ -231,9 +334,9 @@ html{
     </div>
 
     <div class="s-hud">
-      <div class="hud-lbl">HP</div>
-      <div class="hearts" id="hearts"></div>
-      <div class="hud-right" id="hudCount">00/50</div>
+      <span class="hud-icon">&#9829;</span>
+      <div class="hp-bar"><div class="hp-fill" id="hpBar" style="width:0%"></div></div>
+      <div class="hud-right">&#9670;<span id="hudCount">00/50</span></div>
     </div>
 
     <div class="s-tabs">
@@ -267,12 +370,9 @@ html{
     <div class="s-footer">JOSERRA &#9632; ACHIEVEMENT TRACKER &#9632; 2026</div>
   </div>
 
-  <!-- Barra botones carcasa -->
   <div class="controls-bar" style="position:relative;">
     <div class="led"></div>
-    <div class="dpad">
-      <div class="dpad-h"></div><div class="dpad-v"></div><div class="dpad-ctr"></div>
-    </div>
+    <div class="dpad"><div class="dpad-h"></div><div class="dpad-v"></div><div class="dpad-ctr"></div></div>
     <div class="mid-btns">
       <div class="mini-row">
         <div class="mini-btn"><div class="mini-oval"></div><div class="mini-lbl">SELECT</div></div>
@@ -284,33 +384,48 @@ html{
       <div class="btn-a">A</div>
     </div>
   </div>
-
 </div>
 
 <script>
-const SK='mina_platinum_v1',CK='mina_cron_v1',CT=14400;
+const SK='mina_platinum_v1', CK_START='mina_cron_start_v2', CK_ELAPSED='mina_cron_elapsed_v2', CT=14400;
 const DLBL={easy:'FACIL',medium:'NORMAL',hard:'DIFICIL',insane:'EXTREMO'};
 
+// ── DATOS ────────────────────────────────────────────────
+
 const ANY_CAT=[{ico:'⚔️',nm:'CUALQUIER RUN — mejor en NG+',ts:[
-  {id:'hammerama',       nm:'Hammerama',       req:'Derrota un jefe solo con Blaststrike Maul cargado',    dif:'hard',  pct:'~12%'},
-  {id:'untouchable',     nm:'Untouchable',     req:'Derrota un jefe Generador sin recibir daño',           dif:'hard',  pct:'~12%'},
-  {id:'sniper-dagger',   nm:'Sniper Dagger',   req:'Mata jefe con Whisper y Vesper cruzando pantalla',     dif:'hard',  pct:'~10%'},
-  {id:'tip-tapper',      nm:'Tip Tapper',      req:'10 enemigos con la punta del Nightstar Dread Mace',    dif:'hard',  pct:'~8%'},
-  {id:'joule-junkie',    nm:'Joule Junkie',    req:'Mata jefe a 1HP solo Sidearms + Joule Syringe',        dif:'hard',  pct:'~8%'},
-  {id:'shock-tactician', nm:'Shock Tactician', req:'Derrota jefe con chispa del Shock Flint Trinket',      dif:'hard',  pct:'~9%'},
-  {id:'perfect-guard',   nm:'Perfect Guard',   req:'Para 15 ataques seguidos con Guardian Casket',         dif:'hard',  pct:'~10%'},
-  {id:'plasma-survivor', nm:'Plasma Survivor', req:'Llena deposito con Plasma Jug estando a 1 HP',         dif:'hard',  pct:'~12%'},
-  {id:'bonestone-tycoon',nm:'Bonestone Tycoon',req:'Convierte 20000+ Bones en Bone Sinterer de una vez',   dif:'easy',  pct:'~30%'},
-  {id:'lopsided',        nm:'Lopsided',        req:'Sube una stat a 10 con el resto a 3 o menos',          dif:'medium',pct:'~20%'},
-  {id:'beckoning-buddy', nm:'Beckoning Buddy', req:'Criatura Beckoning Collar activa todo combate jefe',   dif:'medium',pct:'~22%'},
-  {id:'combo-conductor', nm:'Combo Conductor', req:'Combo maximo 10s con Chain Capacitor en combate',      dif:'medium',pct:'~25%'},
-  {id:'masochist',       nm:'Masochist',       req:'Derrota jefe con exactamente 3 Beastium Trinkets',     dif:'medium',pct:'~18%'},
-  {id:'pendulum-master', nm:'Pendulum Master', req:'Para 10 ataques sin daño con Dodging Pendulum',        dif:'medium',pct:'~20%'},
+  {id:'hammerama',       nm:'Hammerama',        req:'Derrota un jefe solo con Blaststrike Maul cargado',  dif:'hard',  pct:'~12%'},
+  {id:'untouchable',     nm:'Untouchable',      req:'Derrota un jefe Generador sin recibir daño',         dif:'hard',  pct:'~12%'},
+  {id:'sniper-dagger',   nm:'Sniper Dagger',    req:'Mata jefe con Whisper y Vesper cruzando pantalla',   dif:'hard',  pct:'~10%'},
+  {id:'tip-tapper',      nm:'Tip Tapper',       req:'10 enemigos con la punta del Nightstar Dread Mace',  dif:'hard',  pct:'~8%'},
+  {id:'joule-junkie',    nm:'Joule Junkie',     req:'Mata jefe a 1HP solo Sidearms + Joule Syringe',      dif:'hard',  pct:'~8%'},
+  {id:'shock-tactician', nm:'Shock Tactician',  req:'Derrota jefe con chispa del Shock Flint Trinket',    dif:'hard',  pct:'~9%'},
+  {id:'perfect-guard',   nm:'Perfect Guard',    req:'Para 15 ataques seguidos con Guardian Casket',       dif:'hard',  pct:'~10%'},
+  {id:'plasma-survivor', nm:'Plasma Survivor',  req:'Llena deposito con Plasma Jug estando a 1 HP',       dif:'hard',  pct:'~12%'},
+  {id:'beckoning-buddy', nm:'Beckoning Buddy',  req:'Criatura Beckoning Collar activa todo combate jefe', dif:'medium',pct:'~22%'},
+  {id:'combo-conductor', nm:'Combo Conductor',  req:'Combo maximo 10s con Chain Capacitor en combate',    dif:'medium',pct:'~25%'},
+  {id:'masochist',       nm:'Masochist',        req:'Derrota jefe con exactamente 3 Beastium Trinkets',   dif:'medium',pct:'~18%'},
+  {id:'pendulum-master', nm:'Pendulum Master',  req:'Para 10 ataques sin daño con Dodging Pendulum',      dif:'medium',pct:'~20%'},
+  {id:'bonestone-tycoon',nm:'Bonestone Tycoon', req:'Convierte 20000+ Bones en Bone Sinterer de una vez', dif:'easy',  pct:'~30%'},
+  {id:'lopsided',        nm:'Lopsided',         req:'Sube una stat a 10 con el resto a 3 o menos',        dif:'medium',pct:'~20%'},
+  {id:'bashful',         nm:'Bashful',          req:'3 enemigos de una carga con Drill Driver',            dif:'easy',  pct:'~40%'},
+  {id:'boomerang-blade', nm:'Boomerang Blade',  req:'2 enemigos con Gyro Dagger cambiando dir.',           dif:'easy',  pct:'~38%'},
+  {id:'bounding-bonanza',nm:'Bounding Bonanza', req:'Enemigo con Bounding Bomb tras 3 rebotes',           dif:'medium',pct:'~22%'},
+  {id:'buster-bounce',   nm:'Buster Bounce',    req:'3 enemigos con doble rebote Battery Buster',         dif:'medium',pct:'~20%'},
+  {id:'fogburst',        nm:'Fogburst',         req:'6 enemigos con spray del Fog Thrower',               dif:'easy',  pct:'~42%'},
+  {id:'four-point-hatchet',nm:'Four-Point Hatchet',req:'4 enemigos con 4 chispas Volt Hatchet',          dif:'medium',pct:'~25%'},
+  {id:'haunting-reach',  nm:'Haunting Reach',   req:'Golpea a 25 tiles con Gnawing Ghosts',               dif:'medium',pct:'~28%'},
+  {id:'light-em-up',     nm:"Light 'em Up",     req:'Evita destino oscuro con Dynamo Lantern',            dif:'medium',pct:'~30%'},
+  {id:'mist-glide',      nm:'Mist Glide',       req:'3 enemigos de un uso con Mist Jar',                  dif:'easy',  pct:'~40%'},
+  {id:'pitfall-parasol', nm:'Pitfall Parasol',  req:'Varios enemigos al foso con Deflector Parasol',      dif:'easy',  pct:'~38%'},
+  {id:'skippin-stone',   nm:"Skippin' Stone",   req:"8 tiles sobre agua con Hollower's Rocks",            dif:'medium',pct:'~20%'},
+  {id:'wormhole',        nm:'Wormhole',         req:'Mata enemigo tras teletransportarte con Recall',      dif:'easy',  pct:'~45%'},
+  {id:'steed-hopper',    nm:'Steed Hopper',     req:'3 enemigos en Iron Steed sin tocar suelo',           dif:'easy',  pct:'~32%'},
+  {id:'drag-race',       nm:'Drag Race',        req:'6 pantallas en Iron Steed sin marcha atras',         dif:'easy',  pct:'~30%'},
 ]}];
 
 const PARTIDAS=[
-  {name:'PARTIDA 1',col:'#9bbc0f',
-   desc:'Historia + Coleccion + Sidearms basicos.',
+  {name:'PARTIDA 1',col:'#f5c842',
+   desc:'Historia + Coleccion + Minijuegos.',
    warn:null,info:null,
    cats:[
     {ico:'📖',nm:'HISTORIA',ts:[
@@ -327,34 +442,16 @@ const PARTIDAS=[
       {id:'fishin-reactor',nm:"Fishin' Reactor", req:'Consigue todos los trofeos del Fish Board',      dif:'medium',pct:'~15%'},
       {id:'pawned-off',    nm:'Pawned Off',     req:"Vende el maximo en Pawnty's Exchange",            dif:'easy',  pct:'~35%'},
     ]},
-    {ico:'⚔️',nm:'SIDEARMS',ts:[
-      {id:'bashful',         nm:'Bashful',          req:'3 enemigos de una carga con Drill Driver',     dif:'easy',  pct:'~40%'},
-      {id:'boomerang-blade', nm:'Boomerang Blade',   req:'2 enemigos con Gyro Dagger cambiando dir.',    dif:'easy',  pct:'~38%'},
-      {id:'bounding-bonanza',nm:'Bounding Bonanza',  req:'Enemigo con Bounding Bomb tras 3 rebotes',    dif:'medium',pct:'~22%'},
-      {id:'buster-bounce',   nm:'Buster Bounce',     req:'3 enemigos con doble rebote Battery Buster',  dif:'medium',pct:'~20%'},
-      {id:'fogburst',        nm:'Fogburst',          req:'6 enemigos con spray del Fog Thrower',        dif:'easy',  pct:'~42%'},
-      {id:'four-point-hatchet',nm:'Four-Point Hatchet',req:'4 enemigos con 4 chispas Volt Hatchet',   dif:'medium',pct:'~25%'},
-      {id:'haunting-reach',  nm:'Haunting Reach',    req:'Golpea a 25 tiles con Gnawing Ghosts',        dif:'medium',pct:'~28%'},
-      {id:'light-em-up',     nm:"Light 'em Up",      req:'Evita destino oscuro con Dynamo Lantern',     dif:'medium',pct:'~30%'},
-      {id:'mist-glide',      nm:'Mist Glide',        req:'3 enemigos de un uso con Mist Jar',           dif:'easy',  pct:'~40%'},
-      {id:'pitfall-parasol', nm:'Pitfall Parasol',   req:'Varios enemigos al foso con Deflector',       dif:'easy',  pct:'~38%'},
-      {id:'skippin-stone',   nm:"Skippin' Stone",    req:"8 tiles sobre agua con Hollower's Rocks",     dif:'medium',pct:'~20%'},
-      {id:'wormhole',        nm:'Wormhole',          req:'Mata enemigo tras teletransportarte con Recall',dif:'easy', pct:'~45%'},
-    ]},
     {ico:'🎮',nm:'MINIJUEGOS',ts:[
       {id:'minigame-master',   nm:'Minigame Master',   req:'Racing Ring Dive y Wrecker',           dif:'medium',pct:'~15%'},
       {id:'opossum-impressem', nm:'Opossum Impressem', req:'10 tiles sin tocar el suelo (Lena)',   dif:'easy',  pct:'~35%'},
       {id:'trash-juggler',     nm:'Trash Juggler',     req:'Manda la lata por debajo del puente',  dif:'easy',  pct:'~30%'},
     ]},
-    {ico:'🚗',nm:'IRON STEED',ts:[
-      {id:'steed-hopper',nm:'Steed Hopper',req:'3 enemigos en Iron Steed sin tocar suelo',   dif:'easy',pct:'~32%'},
-      {id:'drag-race',   nm:'Drag Race',   req:'6 pantallas en Iron Steed sin marcha atras', dif:'easy',pct:'~30%'},
-    ]},
   ]},
-  {name:'PARTIDA 2',col:'#8bac0f',
-   desc:'NG+ todo en una run. Sin gastar Bones ni Underlab.',
-   warn:'DIFICULTADORES: Sin venta Armas + Sin venta Suministrador + Laboratorios cerrados. OJO: Labs cerrados = sin Underlab, compatible con Off the Grid.',
-   info:'CONFIRMADO: Speed Runner + Bone Pincher + Bone Keeper + Hardifier + Off the Grid en una sola run NG+.',
+  {name:'PARTIDA 2',col:'#c080ff',
+   desc:'NG+ todo en una run. Sin gastar Bones, sin Underlab.',
+   warn:null,
+   info:'CONFIRMADO: Speed Runner + Bone Pincher + Bone Keeper + Hardifier + Weirdifier + Off the Grid en una sola run NG+.',
    cats:[
     {ico:'🔄',nm:'NG+',ts:[
       {id:'hollowin-again',nm:"Hollowin' Again!",req:'Termina el juego en New Game Plus',dif:'easy',pct:'~20%'},
@@ -366,30 +463,32 @@ const PARTIDAS=[
       {id:'bone-keeper', nm:'Bone Keeper', req:'Sin perder tus Bones en ningun momento',                    dif:'hard',  pct:'~8%'},
       {id:'bone-pincher',nm:'Bone Pincher',req:'Sin gastar Bones en tiendas. Puedes recogerlos y subir nivel.',dif:'medium',pct:'~12%'},
     ]},
-    {ico:'💀',nm:'DIFICULTADORES',ts:[
-      {id:'hardifier',      nm:'Hardifier',               req:'3 dificultadores activos al terminar el juego',  dif:'medium',pct:'~14%'},
-      {id:'no-shop-weapons',nm:'[MOD] Sin venta: Armas',  req:'Dificultador: no aparecen armas en tiendas',    dif:'easy',  pct:'-'},
-      {id:'no-shop-sumin',  nm:'[MOD] Sin venta: Sumin.', req:'Dificultador: el Suministrador no aparece',     dif:'easy',  pct:'-'},
-      {id:'no-underlabs',   nm:'[MOD] Labs cerrados',     req:'Dificultador: sin Underlabs en el mapa. Compatible con Off the Grid.',dif:'hard',pct:'-'},
+    {ico:'💀',nm:'DIFICULTADORES + RAROS',ts:[
+      {id:'hardifier',       nm:'Hardifier',                req:'3+ dificultadores al terminar',                       dif:'medium',pct:'~14%'},
+      {id:'weirdifier',      nm:'Weirdifier',               req:'3+ raros al terminar. Sin venta = Hard+Weird a la vez',dif:'medium',pct:'~10%'},
+      {id:'no-underlabs',    nm:'[MOD] Closed Underlabs',   req:'Hard: sin Underlabs. Compatible con Off the Grid',    dif:'hard',  pct:'-'},
+      {id:'no-shop-emporio', nm:'[MOD] No General Shop',    req:'Hard+Weird: el Emporio no aparece',                   dif:'easy',  pct:'-'},
+      {id:'no-shop-weapons', nm:'[MOD] No Weapons Merchant',req:'Hard+Weird: el mercader de armas no aparece',         dif:'easy',  pct:'-'},
+      {id:'no-shop-sumin',   nm:'[MOD] No Trinket Merchant',req:'Hard+Weird: el Suministrador no aparece',             dif:'easy',  pct:'-'},
+      {id:'no-shop-pawnt',   nm:"[MOD] No Pawnty",          req:"Hard+Weird: Pawnty's Exchange no aparece",            dif:'easy',  pct:'-'},
+      {id:'no-shop-panino',  nm:'[MOD] No Panino',          req:'Hard+Weird: Panino no aparece',                       dif:'easy',  pct:'-'},
     ]},
     {ico:'🚫',nm:'SIN UNDERLAB',ts:[
-      {id:'off-the-grid',nm:'Off the Grid',req:'Sin entrar al Underlab. Usa Proto Spark. Labs cerrados ya lo garantiza.',dif:'hard',pct:'~6%'},
+      {id:'off-the-grid',nm:'Off the Grid',req:'Sin entrar al Underlab. Closed Underlabs ya lo garantiza.',dif:'hard',pct:'~6%'},
     ]},
   ]},
-  {name:'PARTIDA 3',col:'#4a7a20',
+  {name:'PARTIDA 3',col:'#a060e0',
    desc:'Partida NUEVA. Solo Nightstar. Sin coleccionables.',
-   warn:'PARTIDA NUEVA no NG+. Solo Nightstar. No cojas Maul ni Daggers ni trinkets ni coleccionables.',
+   warn:'PARTIDA NUEVA no NG+. Solo Nightstar. No cojas Maul ni Daggers ni trinkets.',
    info:null,
    cats:[
     {ico:'📉',nm:'BELOW ZERO',ts:[
       {id:'below-zero',nm:'Below Zero',req:'Termina con -1% de Coleccion. No recojas nada.',dif:'hard',pct:'~5%'},
     ]},
-    {ico:'🌀',nm:'WEIRDIFIER',ts:[
-      {id:'weirdifier',nm:'Weirdifier',req:'Termina con 3 modificadores Weird activos.',dif:'medium',pct:'~10%'},
-    ]},
   ]},
 ];
 
+// ── STATE ────────────────────────────────────────────────
 let ch={};
 function load(){try{const s=localStorage.getItem(SK);if(s)ch=JSON.parse(s);}catch(e){ch={};}}
 function save(){try{localStorage.setItem(SK,JSON.stringify(ch));}catch(e){}}
@@ -399,43 +498,104 @@ function allTs(){let t=[...ANY_CAT.flatMap(c=>c.ts)];PARTIDAS.forEach(p=>p.cats.
 function total(){return allTs().length;}
 function dn(){return Object.values(ch).filter(Boolean).length;}
 
-let cr=CT,run=false,iv=null;
-function cload(){try{const s=localStorage.getItem(CK);if(s!==null)cr=parseInt(s,10);}catch(e){}}
-function csave(){try{localStorage.setItem(CK,cr);}catch(e){}}
-function cfmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;}
-function cui(){
-  const d=document.getElementById('cd'),b=document.getElementById('cb'),btn=document.getElementById('csb'),sv=document.getElementById('csv');
-  if(!d)return;
-  d.textContent=cfmt(cr);if(b)b.style.width=(cr/CT*100)+'%';
-  d.className=cr<=0?'cron-lcd crit':cr<=3600?'cron-lcd warn':'cron-lcd';
-  if(btn){btn.textContent=run?'PAUSE':'START';btn.className='cron-btn '+(run?'pause':'start');}
-  if(sv){try{const ts=localStorage.getItem(CK+'_ts');sv.textContent=ts?'SAV:'+ts:'';}catch(e){}}
-}
-function ctick(){if(cr>0){cr--;if(cr===3600)alert('>> 1 HORA RESTANTE!');csave();try{localStorage.setItem(CK+'_ts',new Date().toLocaleTimeString('es-ES'));}catch(e){}cui();}else{cstop();alert('>> GAME OVER: 4H!');}}
-function cstart(){if(run||cr<=0)return;run=true;iv=setInterval(ctick,1000);cui();}
-function cstop(){run=false;clearInterval(iv);cui();}
-function ctog(){run?cstop():cstart();}
-function creset(){cstop();cr=CT;csave();try{localStorage.removeItem(CK+'_ts');}catch(e){}render();cui();}
+// ── CRONÓMETRO ───────────────────────────────────────────
+let cronRunning=false, cronInterval=null, warned1h=false;
 
+function cronGetRemaining(){
+  try{
+    const elapsed=parseInt(localStorage.getItem(CK_ELAPSED)||'0',10);
+    if(!cronRunning) return Math.max(0,CT*1000-elapsed);
+    const start=parseInt(localStorage.getItem(CK_START)||'0',10);
+    return Math.max(0,CT*1000-(elapsed+(Date.now()-start)));
+  }catch(e){return CT*1000;}
+}
+
+function cronSaveElapsed(){
+  try{
+    const elapsed=parseInt(localStorage.getItem(CK_ELAPSED)||'0',10);
+    const start=parseInt(localStorage.getItem(CK_START)||'0',10);
+    localStorage.setItem(CK_ELAPSED,elapsed+(Date.now()-start));
+  }catch(e){}
+}
+
+function cfmt(ms){
+  const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+  return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+}
+
+function cui(){
+  const d=document.getElementById('cd'),b=document.getElementById('cb'),
+        btn=document.getElementById('csb'),sv=document.getElementById('csv');
+  if(!d)return;
+  const rem=cronGetRemaining();
+  d.textContent=cfmt(rem);
+  if(b)b.style.width=(rem/(CT*1000)*100)+'%';
+  d.className=rem<=0?'cron-lcd crit':rem<=3600000?'cron-lcd warn':'cron-lcd';
+  if(btn){btn.textContent=cronRunning?'PAUSE':'START';btn.className='cron-btn '+(cronRunning?'pause':'start');}
+  if(cronRunning&&rem<=3600000&&rem>3590000&&!warned1h){warned1h=true;alert('>> 1 HORA RESTANTE!');}
+  if(rem<=0&&cronRunning){cstop();alert('>> GAME OVER: 4H AGOTADAS');}
+  if(sv){sv.textContent=cronRunning?'EN CURSO':'';}
+}
+
+function cstart(){
+  if(cronRunning)return;
+  try{localStorage.setItem(CK_START,Date.now());}catch(e){}
+  cronRunning=true;
+  if(cronGetRemaining()>3600000)warned1h=false;
+  cronInterval=setInterval(cui,1000);cui();
+}
+function cstop(){
+  if(!cronRunning)return;
+  cronSaveElapsed();cronRunning=false;clearInterval(cronInterval);cui();
+}
+function ctog(){cronRunning?cstop():cstart();}
+function creset(){
+  cstop();
+  try{localStorage.setItem(CK_ELAPSED,'0');localStorage.removeItem(CK_START);}catch(e){}
+  warned1h=false;render();cui();
+}
+
+// ── BUILD UI ─────────────────────────────────────────────
 function buildCron(){return`<div class="cron">
 <div class="cron-ttl">&#9632; SPEED RUNNER TIMER &#9632;</div>
-<div class="cron-lcd" id="cd">${cfmt(cr)}</div>
-<div class="bar-out" style="margin-bottom:8px;height:8px"><div class="bar-in" id="cb" style="width:${cr/CT*100}%"></div></div>
+<div class="cron-lcd" id="cd">${cfmt(cronGetRemaining())}</div>
+<div class="bar-out" style="margin-bottom:8px;height:8px">
+  <div class="bar-in" id="cb" style="width:${cronGetRemaining()/(CT*1000)*100}%;background:repeating-linear-gradient(90deg,#c89010 0,#c89010 5px,#f5c842 5px,#f5c842 7px)"></div>
+</div>
 <div class="cron-btns">
-  <button class="cron-btn start" id="csb" onclick="ctog()">START</button>
+  <button class="cron-btn start" id="csb" onclick="ctog()">${cronRunning?'PAUSE':'START'}</button>
   <button class="cron-btn reset" onclick="creset()">RESET</button>
 </div>
 <div class="cron-sv" id="csv"></div>
 </div>`;}
 
-function buildTrinkets(){return`<div class="box-trinkets">
-<span class="box-ttl">&#9632; TRINKETS RECOMENDADOS PARA NG+</span>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Proto Spark</div><div class="trinket-why">IMPRESCINDIBLE — revive 1 vez por encuentro. Sin esto Off the Grid es casi imposible.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Joule Syringe</div><div class="trinket-why">Para Joule Junkie. Mata jefe a 1HP solo con Sidearms.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Dodging Pendulum</div><div class="trinket-why">Para Pendulum Master (10 paradas) y supervivencia real.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Guardian Casket</div><div class="trinket-why">Para Perfect Guard (15 seguidos) y proteccion activa.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Chain Capacitor</div><div class="trinket-why">Para Combo Conductor (10s combo). Facil mientras juegas.</div></div></div>
-<div class="trinket-row"><span class="trinket-star">&#9654;</span><div><div class="trinket-name">Beckoning Collar</div><div class="trinket-why">Para Beckoning Buddy. Solo necesitas llevarlo en un jefe.</div></div></div>
+// Bloque TRINKETS + MODS al fondo de P2
+function buildSetup(){return`<div class="box-setup">
+
+  <div class="setup-section">
+    <span class="setup-ttl gold">&#9670; NG+ TRINKETS</span>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Proto Spark</span><span class="setup-why">Revive 1 vez por encuentro — imprescindible para Off the Grid</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Bell of Grace</span><span class="setup-why">Avisa al acercarse a objetos. Util en speedrun.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Chain Capacitor</span><span class="setup-why">Para Combo Conductor (10s combo max)</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Bellows Bustle</span><span class="setup-why">Mejora el burrow — movilidad y esquiva sin Underlab</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Plasma Jug</span><span class="setup-why">Para Plasma Survivor (llena deposito a 1HP)</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9733;</span><div><span class="setup-name">Dodging Pendulum</span><span class="setup-why">Para Pendulum Master (10 paradas) + supervivencia</span></div></div>
+  </div>
+
+  <div class="setup-section">
+    <span class="setup-ttl purple">&#9670; HARDIFIER + WEIRDIFIER MODS</span>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">Closed Underlabs</span><span class="setup-why">Hard — sin Underlabs. Cuenta para Hardifier. Off the Grid queda garantizado.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No General Shop</span><span class="setup-why">Hard + Weird — el Emporio no aparece</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Weapons Merchant</span><span class="setup-why">Hard + Weird — el mercader de armas no aparece</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Trinket Merchant</span><span class="setup-why">Hard + Weird — el Suministrador no aparece</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Pawnty</span><span class="setup-why">Hard + Weird — Pawnty's Exchange no aparece</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Panino</span><span class="setup-why">Hard + Weird — Panino no aparece</span></div></div>
+    <div class="setup-row" style="margin-top:4px;border-top:1px solid #2d1254;padding-top:4px;">
+      <span class="setup-bullet">&#9658;</span>
+      <div><span class="setup-name" style="color:#f5c842">Con 5 Sin venta + Labs: Hardifier Y Weirdifier en una run</span></div>
+    </div>
+  </div>
+
 </div>`;}
 
 function bT(t){
@@ -454,7 +614,7 @@ function bT(t){
 
 function bCats(cats,pi){
   return cats.map((c,ci)=>{
-    const id=`c${pi}${ci}`;const cd=c.ts.filter(t=>ch[t.id]).length;
+    const id=`c${pi}${ci}`,cd=c.ts.filter(t=>ch[t.id]).length;
     return`<div class="cat open" id="${id}">
 <div class="cat-hdr" onclick="tc('${id}')">
   <div class="cat-lft"><span class="cat-ico">${c.ico}</span><span class="cat-nm">${c.nm}</span></div>
@@ -475,26 +635,26 @@ function bP(p,pi){
   <div class="p-pct" style="color:${p.col}">${d}/${all.length}</div>
 </div>
 </div>`;
-  if(pi===1){h+=buildCron();h+=buildTrinkets();}
-  if(p.info)h+=`<div class="box-info"><span class="box-ttl">&#9658; INFO</span>${p.info}</div>`;
-  if(p.warn)h+=`<div class="box-warn"><span class="box-ttl">&#9658; ATENCION</span>${p.warn}</div>`;
-  h+=bCats(p.cats,pi);return h;
+  if(pi===1) h+=buildCron();
+  if(p.info) h+=`<div class="box-info"><span class="box-ttl">&#9658; INFO</span>${p.info}</div>`;
+  if(p.warn) h+=`<div class="box-warn"><span class="box-ttl">&#9658; ATENCION</span>${p.warn}</div>`;
+  h+=bCats(p.cats,pi);
+  if(pi===1) h+=buildSetup();
+  return h;
 }
 
 function bAny(){
   const d=ANY_CAT.flatMap(c=>c.ts).filter(t=>ch[t.id]).length;
   const tot=ANY_CAT.flatMap(c=>c.ts).length;
   const pct=Math.round(d/tot*100);
-  let h=`<div class="p-hdr">
-<div class="p-name" style="color:#c4d4a8">&#9658; CUALQUIER PARTIDA</div>
-<div class="p-desc">Con jefes y trinkets. Ideales para NG+ con todo disponible.</div>
+  return`<div class="p-hdr">
+<div class="p-name" style="color:#e0b0ff">&#9658; CUALQUIER PARTIDA</div>
+<div class="p-desc">Sidearms, Iron Steed, trinkets con jefes. Ideales para NG+.</div>
 <div class="p-row">
-  <div class="bar-out"><div class="bar-in" style="width:${pct}%"></div></div>
-  <div class="p-pct">${d}/${tot}</div>
+  <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:repeating-linear-gradient(90deg,#8040c0 0,#8040c0 5px,#c080ff 5px,#c080ff 7px)"></div></div>
+  <div class="p-pct" style="color:#e0b0ff">${d}/${tot}</div>
 </div>
-</div>`;
-  h+=bCats(ANY_CAT,'a');return h;
-}
+</div>${bCats(ANY_CAT,'a')}`;}
 
 function bAll(){
   let h=`<div class="all-ttl">&#9658; CUALQUIER PARTIDA</div>`;
@@ -504,7 +664,7 @@ function bAll(){
     p.cats.forEach(c=>c.ts.forEach(t=>{h+=bT(t);}));
   });
   const ok=dn()>=total();
-  h+=`<div class="all-ttl" style="color:#9bbc0f">&#9658; PLATINO</div>
+  return h+`<div class="all-ttl" style="color:#f5c842">&#9658; PLATINO</div>
 <div class="trophy${ok?' done':''}">
 <div class="px-chk">${ok?'&#10003;':''}</div>
 <div class="t-info">
@@ -512,13 +672,11 @@ function bAll(){
   <div class="t-req">Consigue todas las hazanas</div>
   <div class="t-meta"><span class="t-badge d-insane">EXTREMO</span><span class="t-pct">STEAM:~1%</span></div>
 </div>
-</div>`;return h;
-}
+</div>`;}
 
 function render(){
   const d=dn(),tot=total(),pct=Math.round(d/tot*100);
-  const hh=document.getElementById('hearts');
-  if(hh){const f=Math.min(10,Math.floor(d/(tot/10)));hh.innerHTML=Array.from({length:10},(_,i)=>`<div class="heart${i<f?'':' off'}"></div>`).join('');}
+  const hp=document.getElementById('hpBar');if(hp)hp.style.width=pct+'%';
   const hc=document.getElementById('hudCount');if(hc)hc.textContent=String(d).padStart(2,'0')+'/'+String(tot+1).padStart(2,'0');
   const gb=document.getElementById('gBar');if(gb)gb.style.width=pct+'%';
   const gp=document.getElementById('gPct');if(gp)gp.textContent=pct+'%';
@@ -537,7 +695,8 @@ function showTab(t){
   document.querySelector('[data-tab="'+t+'"]').classList.add('active');
 }
 
-cload();load();render();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)cui();});
+load();render();
 </script>
 </body>
 </html>
