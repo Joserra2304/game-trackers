@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <link rel="manifest" href="/game-trackers/manifest.json">
 <meta name="theme-color" content="#1a0a2e">
-<title>MINA THE HOLLOWER — ACHIEVEMENT TRACKER</title>
+<title>MINA — ACHIEVEMENT TRACKER</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -464,14 +464,8 @@ const PARTIDAS=[
       {id:'bone-pincher',nm:'Bone Pincher',req:'Sin gastar Bones en tiendas. Puedes recogerlos y subir nivel.',dif:'medium',pct:'~12%'},
     ]},
     {ico:'💀',nm:'DIFICULTADORES + RAROS',ts:[
-      {id:'hardifier',       nm:'Hardifier',                req:'3+ dificultadores al terminar',                       dif:'medium',pct:'~14%'},
-      {id:'weirdifier',      nm:'Weirdifier',               req:'3+ raros al terminar. Sin venta = Hard+Weird a la vez',dif:'medium',pct:'~10%'},
-      {id:'no-underlabs',    nm:'[MOD] Closed Underlabs',   req:'Hard: sin Underlabs. Compatible con Off the Grid',    dif:'hard',  pct:'-'},
-      {id:'no-shop-emporio', nm:'[MOD] No General Shop',    req:'Hard+Weird: el Emporio no aparece',                   dif:'easy',  pct:'-'},
-      {id:'no-shop-weapons', nm:'[MOD] No Weapons Merchant',req:'Hard+Weird: el mercader de armas no aparece',         dif:'easy',  pct:'-'},
-      {id:'no-shop-sumin',   nm:'[MOD] No Trinket Merchant',req:'Hard+Weird: el Suministrador no aparece',             dif:'easy',  pct:'-'},
-      {id:'no-shop-pawnt',   nm:"[MOD] No Pawnty",          req:"Hard+Weird: Pawnty's Exchange no aparece",            dif:'easy',  pct:'-'},
-      {id:'no-shop-panino',  nm:'[MOD] No Panino',          req:'Hard+Weird: Panino no aparece',                       dif:'easy',  pct:'-'},
+      {id:'hardifier',  nm:'Hardifier',  req:'3+ dificultadores activos al terminar el juego', dif:'medium',pct:'~14%'},
+      {id:'weirdifier', nm:'Weirdifier', req:'3+ modificadores Raros activos al terminar',     dif:'medium',pct:'~10%'},
     ]},
     {ico:'🚫',nm:'SIN UNDERLAB',ts:[
       {id:'off-the-grid',nm:'Off the Grid',req:'Sin entrar al Underlab. Closed Underlabs ya lo garantiza.',dif:'hard',pct:'~6%'},
@@ -484,6 +478,9 @@ const PARTIDAS=[
    cats:[
     {ico:'📉',nm:'BELOW ZERO',ts:[
       {id:'below-zero',nm:'Below Zero',req:'Termina con -1% de Coleccion. No recojas nada.',dif:'hard',pct:'~5%'},
+    ]},
+    {ico:'📊',nm:'STATS',ts:[
+      {id:'lopsided',nm:'Lopsided',req:'Sube una stat a 10 con el resto a 3 o menos. Facil en partida nueva.',dif:'medium',pct:'~20%'},
     ]},
   ]},
 ];
@@ -569,7 +566,7 @@ function buildCron(){return`<div class="cron">
 <div class="cron-sv" id="csv"></div>
 </div>`;}
 
-// Bloque TRINKETS + MODS al fondo de P2
+// TIPS P2 — al final de la partida 2
 function buildSetup(){return`<div class="box-setup">
 
   <div class="setup-section">
@@ -584,7 +581,7 @@ function buildSetup(){return`<div class="box-setup">
 
   <div class="setup-section">
     <span class="setup-ttl purple">&#9670; HARDIFIER + WEIRDIFIER MODS</span>
-    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">Closed Underlabs</span><span class="setup-why">Hard — sin Underlabs. Cuenta para Hardifier. Off the Grid queda garantizado.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">Closed Underlabs</span><span class="setup-why">Hard — sin Underlabs. Off the Grid queda garantizado.</span></div></div>
     <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No General Shop</span><span class="setup-why">Hard + Weird — el Emporio no aparece</span></div></div>
     <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Weapons Merchant</span><span class="setup-why">Hard + Weird — el mercader de armas no aparece</span></div></div>
     <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Trinket Merchant</span><span class="setup-why">Hard + Weird — el Suministrador no aparece</span></div></div>
@@ -592,10 +589,26 @@ function buildSetup(){return`<div class="box-setup">
     <div class="setup-row"><span class="setup-bullet p">&#9632;</span><div><span class="setup-name">No Panino</span><span class="setup-why">Hard + Weird — Panino no aparece</span></div></div>
     <div class="setup-row" style="margin-top:4px;border-top:1px solid #2d1254;padding-top:4px;">
       <span class="setup-bullet">&#9658;</span>
-      <div><span class="setup-name" style="color:#f5c842">Con 5 Sin venta + Labs: Hardifier Y Weirdifier en una run</span></div>
+      <div><span class="setup-name" style="color:#f5c842">Con 5 Sin venta + Labs cerrados: Hardifier Y Weirdifier en una run</span></div>
     </div>
   </div>
 
+</div>`;}
+
+// TIPS P3 — Below Zero
+function buildTipsP3(){return`<div class="box-setup">
+  <div class="setup-section">
+    <span class="setup-ttl gold">&#9670; TIPS: BELOW ZERO (-1%)</span>
+    <div class="setup-row"><span class="setup-bullet">&#9658;</span><div><span class="setup-name">Que cuenta para el %</span><span class="setup-why">Segun la comunidad: Armas principales, Trinkets, Capas/Armaduras y objetos de tienda. Las Sidearms NO cuentan para el porcentaje de coleccion.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9658;</span><div><span class="setup-name">La teoria del -1%</span><span class="setup-why">Vende el arma inicial (la unica que te obligan a coger) en Pawnty's Exchange una vez desbloqueado. Eso puede bajar el % por debajo de -1% segun un hilo de Steam.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9658;</span><div><span class="setup-name">No recojas nada</span><span class="setup-why">No cojas armas principales, trinkets ni capas. Pasa de largo todas las tiendas. Solo Sidearms si quieres, ya que no suman al %.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9658;</span><div><span class="setup-name">Partida nueva obligatoria</span><span class="setup-why">Debe ser save nuevo, no NG+. En NG+ ya tienes toda la coleccion de P1 y el % seria positivo desde el inicio.</span></div></div>
+    <div class="setup-row"><span class="setup-bullet">&#9658;</span><div><span class="setup-name">Estado actual</span><span class="setup-why">A fecha de lanzamiento nadie tiene este logro confirmado aun en Steam (~5%). La mecanica exacta esta pendiente de datamine. Pendiente de confirmacion definitiva por la comunidad.</span></div></div>
+    <div class="setup-row" style="margin-top:4px;border-top:1px solid #2d1254;padding-top:4px;">
+      <span class="setup-bullet" style="color:#f5c842">&#9658;</span>
+      <div><span class="setup-name" style="color:#f5c842">Compatible con Weirdifier en esta misma run</span><span class="setup-why">Activa 3 modificadores Weird y termina el juego para sacar ambos a la vez.</span></div>
+    </div>
+  </div>
 </div>`;}
 
 function bT(t){
@@ -635,11 +648,11 @@ function bP(p,pi){
   <div class="p-pct" style="color:${p.col}">${d}/${all.length}</div>
 </div>
 </div>`;
-  if(pi===1) h+=buildCron();
+  if(pi===1){h+=buildCron();h+=buildSetup();}
   if(p.info) h+=`<div class="box-info"><span class="box-ttl">&#9658; INFO</span>${p.info}</div>`;
   if(p.warn) h+=`<div class="box-warn"><span class="box-ttl">&#9658; ATENCION</span>${p.warn}</div>`;
   h+=bCats(p.cats,pi);
-  if(pi===1) h+=buildSetup();
+  if(pi===2) h+=buildTipsP3();
   return h;
 }
 
